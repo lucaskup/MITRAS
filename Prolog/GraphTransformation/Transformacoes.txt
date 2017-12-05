@@ -1,0 +1,8 @@
+Transformação 1 - Adicionar um campo a Pessoa
+	openmrs-core-2.0.5\api\src\main\java\org\openmrs\PersonName.java -> adicionado o campo novo, método getter e setter
+	openmrs-api/src/main/resources/org/openmrs/api/db/hibernate/PersonName.hbm.xml -> Arquivo de mapeamento objeto relacional
+	openmrs-core-2.0.5/api/src/main/resources/messages.properties -> Adição do Label do novo campo
+	openmrs-module-legacyui-master\omod\src\main\resources\webModuleApplicationContext.xml -> adicionar o campo novo ao xml pois a tela é criada dinâmicamente
+	legacyui-omod/src/main/java/org/openmrs/web/controller/person/PersonFormController.java -> Controller do form, precisa ser atualizado com o novo campo
+	
+	
