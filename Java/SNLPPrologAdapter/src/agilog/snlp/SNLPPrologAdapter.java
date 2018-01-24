@@ -1,25 +1,21 @@
 package agilog.snlp;
 
-import edu.stanford.nlp.coref.CorefCoreAnnotations.CorefChainAnnotation;
-import edu.stanford.nlp.coref.data.CorefChain;
-import edu.stanford.nlp.ling.*;
-import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
-import edu.stanford.nlp.pipeline.*;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.semgraph.SemanticGraph;
 import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.BasicDependenciesAnnotation;
-import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation;
 import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.EnhancedPlusPlusDependenciesAnnotation;
 import edu.stanford.nlp.semgraph.SemanticGraphEdge;
-import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.trees.TreeCoreAnnotations;
-import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
-
-import java.util.*;
 
 public class SNLPPrologAdapter {
 	private String[] words;
@@ -45,6 +41,7 @@ public class SNLPPrologAdapter {
 	}
 
 	public SNLPPrologAdapter(String text) {
+		
 		// creates a StanfordCoreNLP object, with POS tagging, lemmatization, NER,
 		// parsing, and coreference resolution
 		Properties props = new Properties();
@@ -68,7 +65,7 @@ public class SNLPPrologAdapter {
 		// a CoreMap is essentially a Map that uses class objects as keys and has values
 		// with custom types
 		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
-		Tree tree = null;
+		//Tree tree = null;
 		SemanticGraph dependencies = null;
 		ArrayList<String> vetor = new ArrayList<>();
 
@@ -149,23 +146,37 @@ public class SNLPPrologAdapter {
 			
 			this.basicDependenceGraph = new String[1];
 			this.basicDependenceGraph = grafoDependenciasBasica.toArray(this.basicDependenceGraph);
-			
+			System.out.println(dependencies.edgeListSorted());
 		}
 		this.words = vetor.toArray(this.words);
 		// This is the coreference link graph
 		// Each chain stores a set of mentions that link to each other,
 		// along with a method for getting the most representative mention
 		// Both sentence and token offsets start at 1!
-		Map<Integer, CorefChain> graph = document.get(CorefChainAnnotation.class);
+		//Map<Integer, CorefChain> graph = document.get(CorefChainAnnotation.class);
+		limpaApostrofo();
+	}
 
+	private void limpaApostrofo() {
+		for (int i = 0; i < this.basicDependenceGraph.length; i++) {
+			this.basicDependenceGraph[i] = this.basicDependenceGraph[i].replaceAll("'", "");
+		}
+		for (int i = 0; i < this.dependenceGraph.length; i++) {
+			this.dependenceGraph[i] = this.dependenceGraph[i].replaceAll("'", "");
+		}
+		for (int i = 0; i < this.words.length; i++) {
+			this.words[i] = this.words[i].replaceAll("'", "");
+		}
+		//this.parseTree.replaceAll("'", null);
 	}
 
 	public static void main(String[] args) {
-		SNLPPrologAdapter n = new SNLPPrologAdapter("Please, add a new field in costumer register");
+		SNLPPrologAdapter n = new SNLPPrologAdapter("Delete information about patient\'s age");
 		String[] lista = n.getBasicDependenceGraph();
 		for (int i = 0; i < lista.length; i++) {
 			System.out.println(lista[i]);
 		}
+		
 		
 		// creates a StanfordCoreNLP object, with POS tagging, lemmatization, NER,
 		// parsing, and coreference resolution

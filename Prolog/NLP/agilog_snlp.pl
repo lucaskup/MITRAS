@@ -40,6 +40,8 @@ snlp_assert_pos_tag(N) :-
 snlp_assert_dependence_tree(N) :-
 	N::getDependenceGraph([]) => Edges, 
 	array::Edges=>List,
+	write('Lista de Termos: '),
+	writeln(List),
 	maplist(term_string,ListTerm,List),
 	writeln(ListTerm),
 	retractall(edge_dependence(_,_,_)),
@@ -48,6 +50,8 @@ snlp_assert_dependence_tree(N) :-
 snlp_assert_basic_dependence_tree(N) :-
 	N::getBasicDependenceGraph([]) => Edges, 
 	array::Edges=>List,
+	write('Lista de Termos: '),
+	writeln(List),
 	maplist(term_string,ListTerm,List),
 	writeln(ListTerm),
 	retractall(edge_dependence_basic(_,_,_)),
@@ -80,6 +84,9 @@ is_synonym(hide,X) :-
 is_synonym(new,X) :-
 	memberchk(X, ['new']).
 
+is_synonym(field,X) :-
+	memberchk(X, ['field']).	
+
 %% Transformacao 1 permite 'adicionar campos'
 
 %%Frase exemplo: 
@@ -96,18 +103,19 @@ t1 :-
 
 	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds	
 	findall(X,edge_dependence_basic(What, X, compound),Z),
-	atomic_list_concat(Z, ' ', F),
+	atomic_list_concat(Z, ' ', Complete_What),
 
 	atom_concat(Where_Complement,' ',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
 	writeln('1'),
 	writeln('## Transformation 1 ##'),
-	write('Field Name: '), writeln(F),
+	write('Field Name: '), writeln(Complete_What),
 	write('Location Name: '),writeln(Complete_Where),!.
 
+%% Praticamente a mesma regra que a anterior, mas dependendo do tipo de substantivo empregado ao campo, muda uma dependencia
 %%Frase exemplo: 
-%% Please, add a identity field in the customer register
+%% Please, add a cell phone number in customer register
 t1 :-
 	verb(Verb),
 	is_synonym('add',Verb),
@@ -214,16 +222,33 @@ t1 :-
 %%Frase exemplo: 
 %% Please, add a document field in the register/Add a document field in the register
 t1 :-
-	verb(X),
-	is_synonym('add',X),
-	edge_dependence_basic(X,What,dobj),
+	verb(Verb),
+	is_synonym('add',Verb),
+	edge_dependence_basic(Verb,What,dobj),
 	edge_dependence_basic(What, What_Complement,compound),
-	edge_dependence_basic(X,Where,nmod),
+	edge_dependence_basic(Verb,Where,nmod),
 	
 	writeln('7'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '), writeln(What_Complement),
 	write('Location Name: '),writeln(Where),!.
+
+%%Frase exemplo: 
+%%Please, add age in the customer form
+t1 :-
+	verb(Verb),
+	is_synonym('add',Verb),
+	edge_dependence_basic(Verb,What,dobj),
+	edge_dependence_basic(Verb,Where,nmod),
+	edge_dependence_basic(Where,Where_Complement,compound),
+	
+	atom_concat(Where_Complement,'_',U_Where_Complement),
+	atom_concat(U_Where_Complement,Where,Complete_Where),
+
+	writeln('8'),
+	writeln('## Transformation 1 ##'),
+	write('Field Name: '),writeln(What),
+	write('Location Name: '),writeln(Complete_Where),!.
 
 %%Frase exemplo: 
 %%Please, add a new field in the customer form
@@ -236,7 +261,7 @@ t1 :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('8'),
+	writeln('9'),
 	writeln('## Transformation 1 ##'),
 	writeln('Field Name: >> NOT INFORMED <<'),
 	write('Location Name: '),writeln(Complete_Where),!.
@@ -252,7 +277,7 @@ t1 :-
 %Nega para a afirmar que o usuario indicou que quer adicionar um campo mas nao disse qual o nome do campo.
 	\+edge_dependence_basic(What,_,compound),
 
-	writeln('9'),
+	writeln('10'),
 	writeln('## Transformation 1 ##'),
 	writeln('Field Name: >> NOT INFORMED <<'),
 	write('Location Name: '),writeln(Where),!.
@@ -260,8 +285,35 @@ t1 :-
 
 %% Transformcao 2 'ocultar campos'
 
+%%Frases exemplo: 
+%% Delete identity field in the customer register
+%% Delete identity card field in the customer register
+t2 :-
+	verb(Verb),
+	is_synonym('hide',Verb),
+	edge_dependence_basic(Verb,What,dobj),
+	edge_dependence_basic(Verb,Where,nmod),
+	edge_dependence_basic(Where,Where_Complement,compound),
+	is_synonym('field',What),
+
+	%%usa a proxima verificacao apenas para comprovar a existencia de um compound relacionado com um substantivo para validar a regra.	
+	edge_dependence_basic(What,_,compound),
+
+	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds	
+	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
+	atomic_list_concat(List_Compound_What, ' ',Complete_What),
+
+	atom_concat(Where_Complement,' ',U_Where_Complement),
+	atom_concat(U_Where_Complement,Where,Complete_Where),
+
+	writeln('0'),
+	writeln('## Transformation 2 ##'),
+	write('Field To Hide: '), writeln(Complete_What),
+	write('Location Name: '),writeln(Complete_Where),!.
+
 %%Frase exemplo: 
-%% Please, add an identity field in the customer register
+%%Delete identity card in the customer register
+%%Remove cell phone number in the customer form 
 t2 :-
 	verb(Verb),
 	is_synonym('hide',Verb),
@@ -274,18 +326,74 @@ t2 :-
 
 	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds	
 	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
-	atomic_list_concat(List_Compound_What, ' ',Complete_What),
+	atomic_list_concat(List_Compound_What, ' ',Compound_What),	
+
+	atom_concat(Compound_What,' ',U_What_Complement),
+	atom_concat(U_What_Complement,What,Complete_What),
 
 	atom_concat(Where_Complement,' ',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
 	writeln('1'),
 	writeln('## Transformation 2 ##'),
-	write('Field To Hide: '), writeln(Complete_What),
+	write('Field To Hide: '),writeln(Complete_What),
+	write('Location Name: '),writeln(Complete_Where),!.
+
+
+
+%%Frases exemplo: 
+%% Delete information about patient's cell phone in the customer register
+%% Delete information about patient's street name in the register
+t2 :-
+	verb(Verb),
+	is_synonym('hide',Verb),
+	edge_dependence_basic(Verb,Ligacao,dobj),
+	edge_dependence_basic(Ligacao,What,nmod),
+	edge_dependence_basic(What,Where,nmod),
+	edge_dependence_basic(Where,Where_Complement,compound),
+
+	%%usa a proxima verificacao apenas para comprovar a existencia de um compound relacionado com um substantivo para validar a regra.	
+	edge_dependence_basic(What,_,compound),
+
+	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds	
+	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
+	atomic_list_concat(List_Compound_What, ' ',Compound_What),	
+	
+	atom_concat(Compound_What,' ',U_What_Complement),
+	atom_concat(U_What_Complement,What,Complete_What),
+
+	atom_concat(Where_Complement,' ',U_Where_Complement),
+	atom_concat(U_Where_Complement,Where,Complete_Where),
+
+	writeln('2'),
+	writeln('## Transformation 2 ##'),
+	write('Field To Hide: '),writeln(Complete_What),
+	write('Location Name: '),writeln(Complete_Where),!.
+
+%%Frases exemplo: 
+%% Delete information about patient's age in the customer register
+t2 :-
+	verb(Verb),
+	is_synonym('hide',Verb),
+	edge_dependence_basic(Verb,Ligacao,dobj),
+	edge_dependence_basic(Ligacao,What,nmod),
+	edge_dependence_basic(What,What_Complement,nmod:poss),
+	edge_dependence_basic(What,Where,nmod),
+	edge_dependence_basic(Where,Where_Complement,compound),
+
+	atom_concat(What_Complement,' ',U_What_Complement),
+	atom_concat(U_What_Complement,What,Complete_What),
+
+	atom_concat(Where_Complement,' ',U_Where_Complement),
+	atom_concat(U_Where_Complement,Where,Complete_Where),
+
+	writeln('3'),
+	writeln('## Transformation 2 ##'),
+	write('Field To Hide: '),writeln(Complete_What),
 	write('Location Name: '),writeln(Complete_Where),!.
 
 %%Frase exemplo: 
-%% Delete information about patient's age
+%% Delete weight in the customer register
 t2 :-
 	verb(Verb),
 	is_synonym('hide',Verb),
@@ -293,20 +401,85 @@ t2 :-
 	edge_dependence_basic(Verb,Where,nmod),
 	edge_dependence_basic(Where,Where_Complement,compound),
 
+	atom_concat(Where_Complement,' ',U_What_Complement),
+	atom_concat(U_What_Complement,Where,Complete_Where),
+
+	writeln('5'),
+	writeln('## Transformation 2 ##'),
+	write('Field To Hide: '),writeln(What),
+	write('Location Name: '),writeln(Complete_Where),!.
+
+%%Frase exemplo: 
+%% Delete identity card field in the register
+t2 :-
+	verb(Verb),
+	is_synonym('hide',Verb),
+	edge_dependence_basic(Verb,What,dobj),
+
 	%%usa a proxima verificacao apenas para comprovar a existencia de um compound relacionado com um substantivo para validar a regra.	
 	edge_dependence_basic(What,_,compound),
 
 	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds	
-	findall(X,edge_dependence_basic(What, X, compound),Z),
-	atomic_list_concat(Z, ' ', F),
+	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
+	atomic_list_concat(List_Compound_What, ' ',Complete_What),	
 
-	atom_concat(Where_Complement,' ',U_Where_Complement),
-	atom_concat(U_Where_Complement,Where,Complete_Where),
-
-	writeln('1'),
+	writeln('6'),
 	writeln('## Transformation 2 ##'),
-	write('Field To Hide: '), writeln(F),
-	write('Location Name: '),writeln(Complete_Where),!.
+	write('Field To Hide: '),writeln(Complete_What),
+	write('Location Name: >> NOT INFORMED <<'),!.
+
+%%Frase exemplo: 
+%% Delete weight in the register
+t2 :-
+	verb(Verb),
+	is_synonym('hide',Verb),
+	edge_dependence_basic(Verb,What,dobj),
+	edge_dependence_basic(Verb,_,nmod),
+	%%edge_dependence_basic(Where,Where_Complement,compound),
+
+	writeln('7'),
+	writeln('## Transformation 2 ##'),
+	write('Field To Hide: '),writeln(What),
+	write('Location Name: >> NOT INFORMED <<'),!.
+
+%%Frase exemplo: 
+%% Delete information about patient's age
+t2 :-
+	verb(Verb),
+	is_synonym('hide',Verb),
+	edge_dependence_basic(Verb,Ligacao,dobj),
+	edge_dependence_basic(Ligacao,What,nmod),
+	edge_dependence_basic(What,What_Complement,nmod:poss),
+
+	atom_concat(What_Complement,' ',U_What_Complement),
+	atom_concat(U_What_Complement,What,Complete_What),
+
+	writeln('8'),
+	writeln('## Transformation 2 ##'),
+	write('Field To Hide: '),writeln(Complete_What),
+	write('Location Name: >> NOT INFORMED <<'),!.
+
+%%Frases exemplo: 
+%% Delete cell phone field.
+%% Hide street name field.
+t2 :-
+	verb(Verb),
+	is_synonym('hide',Verb),
+	edge_dependence_basic(Verb,Ligacao,dobj),
+
+	%%usa a verificacao abaixo apenas para comprovar a existencia de um compound relacionado com um verbo para validar a regra.	
+	edge_dependence_basic(Ligacao,_,compound),
+
+	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds	
+	findall(X,edge_dependence_basic(Ligacao, X, compound),List_Compound_What),
+	atomic_list_concat(List_Compound_What, ' ',Complete_What),
+
+	writeln('9'),
+	writeln('## Transformation 2 ##'),
+	write('Field To Hide: '),writeln(Complete_What),
+	write('Location Name: >> NOT INFORMED <<'),!.
+
+
 
 
 
