@@ -288,6 +288,7 @@ t1 :-
 %%Frases exemplo: 
 %% Delete identity field in the customer register
 %% Delete identity card field in the customer register
+%% On the customer register, please remove Cell Phone field
 t2 :-
 	verb(Verb),
 	is_synonym('hide',Verb),
@@ -313,7 +314,7 @@ t2 :-
 
 %%Frase exemplo: 
 %%Delete identity card in the customer register
-%%Remove cell phone number in the customer form 
+%%I would like to remove cell phone number in the customer form 
 t2 :-
 	verb(Verb),
 	is_synonym('hide',Verb),
@@ -415,6 +416,7 @@ t2 :-
 	verb(Verb),
 	is_synonym('hide',Verb),
 	edge_dependence_basic(Verb,What,dobj),
+	is_synonym('field',What),
 
 	%%usa a proxima verificacao apenas para comprovar a existencia de um compound relacionado com um substantivo para validar a regra.	
 	edge_dependence_basic(What,_,compound),
@@ -429,6 +431,29 @@ t2 :-
 	write('Location Name: >> NOT INFORMED <<'),!.
 
 %%Frase exemplo: 
+%% Delete cell phone in the register
+t2 :-
+	verb(Verb),
+	is_synonym('hide',Verb),
+	edge_dependence_basic(Verb,What,dobj),
+
+	%%usa a proxima verificacao apenas para comprovar a existencia de um compound relacionado com um substantivo para validar a regra.	
+	edge_dependence_basic(What,_,compound),
+
+	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds	
+	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
+	atomic_list_concat(List_Compound_What, ' ',Compound_What),
+
+	atom_concat(Compound_What,' ',U_What_Complement),
+	atom_concat(U_What_Complement,What,Complete_What),
+
+	writeln('7'),
+	writeln('## Transformation 2 ##'),
+	write('Field To Hide: '),writeln(Complete_What),
+	write('Location Name: >> NOT INFORMED <<'),!.
+
+
+%%Frase exemplo: 
 %% Delete weight in the register
 t2 :-
 	verb(Verb),
@@ -437,11 +462,12 @@ t2 :-
 	edge_dependence_basic(Verb,_,nmod),
 	%%edge_dependence_basic(Where,Where_Complement,compound),
 
-	writeln('7'),
+	writeln('8'),
 	writeln('## Transformation 2 ##'),
 	write('Field To Hide: '),writeln(What),
 	write('Location Name: >> NOT INFORMED <<'),!.
 
+	
 %%Frase exemplo: 
 %% Delete information about patient's age
 t2 :-
@@ -454,7 +480,7 @@ t2 :-
 	atom_concat(What_Complement,' ',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 
-	writeln('8'),
+	writeln('9'),
 	writeln('## Transformation 2 ##'),
 	write('Field To Hide: '),writeln(Complete_What),
 	write('Location Name: >> NOT INFORMED <<'),!.
@@ -474,7 +500,7 @@ t2 :-
 	findall(X,edge_dependence_basic(Ligacao, X, compound),List_Compound_What),
 	atomic_list_concat(List_Compound_What, ' ',Complete_What),
 
-	writeln('9'),
+	writeln('10'),
 	writeln('## Transformation 2 ##'),
 	write('Field To Hide: '),writeln(Complete_What),
 	write('Location Name: >> NOT INFORMED <<'),!.
