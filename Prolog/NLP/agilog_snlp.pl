@@ -123,7 +123,7 @@ t1 :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
-	edge_dependence_basic(Verb,Where,nmod),
+	edge_dependence_basic(What,Where,nmod),
 	edge_dependence_basic(Where,Where_Complement,compound),
 	is_synonym('field',What),
 
@@ -172,7 +172,7 @@ t1 :-
 	write('Location Name: '),writeln(Complete_Where),!.
 
 %%Frase exemplo: 
-%% Please, add an identity field in the customer register
+%% Please, add identity field in the customer register
 t1 :-
 	verb(Verb),
 	is_synonym('add',Verb),
@@ -189,22 +189,6 @@ t1 :-
 	write('Field Name: '), writeln(What_Complement),
 	write('Location Name: '),writeln(Complete_Where),!.
 
-%%Frase exemplo: 
-%%Put a new information in costumer register
-t1 :-
-	verb(Verb),
-	is_synonym('add',Verb),
-	edge_dependence_basic(Verb,Ligacao,dobj),
-	edge_dependence_basic(Ligacao,Where,nmod),
-	edge_dependence_basic(Where,Where_Complement,compound),
-	
-	atom_concat(Where_Complement,'_',U_Where_Complement),
-	atom_concat(U_Where_Complement,Where,Complete_Where),
-
-	writeln('5'),
-	writeln('## Transformation 1 ##'),
-	writeln('Field Name: >> NOT INFORMED <<'),
-	write('Location Name: '),writeln(Complete_Where),!.
 
 %% Frase exemplo:
 %% I need a field for secret name in the patient form
@@ -213,7 +197,7 @@ t1 :-
 	edge_dependence_basic(What,Adjective,amod),
 	edge_dependence_basic(What,Where,nmod),
 	edge_dependence_basic(Where,Where_Complement,compound),
-	
+	is_synonym('field',What),
 	word(What,nn,_),		
 
 	atom_concat(Where_Complement,' ',U_Where_Complement),
@@ -222,7 +206,7 @@ t1 :-
 	atom_concat(Adjective,' ',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 
-	writeln('6'),
+	writeln('5'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(Complete_What),
 	write('Location Name: '),writeln(Complete_Where),!.
@@ -247,13 +231,13 @@ t1 :-
 	atom_concat(What_Complement,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 
-	writeln('7'),
+	writeln('6'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(Complete_What),
 	write('Location Name: '),writeln(Complete_Where),!.
 
 %%Frase exemplo: 
-%% Please, add a phone number field in the customer/Add a document field in the patient
+%% Please, add a phone number field in the person/Add a document field in the patient
 t1 :-
 	verb(Verb),
 	is_synonym('add',Verb),
@@ -269,25 +253,9 @@ t1 :-
 	findall(X,edge_dependence_basic(What, X, compound),Z),
 	atomic_list_concat(Z, ' ', Complete_What),
 	
-	writeln('8'),
+	writeln('7'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '), writeln(Complete_What),
-	write('Location Name: '),writeln(Where),!.
-
-%%Frase exemplo: 
-%% Aqui exemplos de frases que o usuario indica o nome na forma simples do local de insercao
-%% Please, add a document field in the customer/Add a document field in the patient
-t1 :-
-	verb(Verb),
-	is_synonym('add',Verb),
-	edge_dependence_basic(Verb,What,dobj),
-	edge_dependence_basic(What, What_Complement,compound),
-	edge_dependence_basic(Verb,Where,nmod),
-	is_synonym('patient',Where),
-	
-	writeln('9'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '), writeln(What_Complement),
 	write('Location Name: '),writeln(Where),!.
 
 %%Frase exemplo: 
@@ -300,7 +268,7 @@ t1 :-
 	edge_dependence_basic(What, What_Complement,compound),
 	edge_dependence_basic(Verb,_,nmod),
 	
-	writeln('10'),
+	writeln('8'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '), writeln(What_Complement),
 	writeln('Location Name: >> NOT INFORMED <<'),!.
@@ -313,14 +281,33 @@ t1 :-
 	edge_dependence_basic(Verb,What,dobj),
 	edge_dependence_basic(Verb,Where,nmod),
 	edge_dependence_basic(Where,Where_Complement,compound),
+	\+is_synonym('field',What),
 	
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('11'),
+	writeln('9'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(What),
 	write('Location Name: '),writeln(Complete_Where),!.
+
+%%Frase exemplo: 
+%%Put a new information in costumer register
+t1 :-
+	verb(Verb),
+	is_synonym('add',Verb),
+	edge_dependence_basic(Verb,Ligacao,dobj),
+	edge_dependence_basic(Ligacao,Where,nmod),
+	edge_dependence_basic(Where,Where_Complement,compound),
+	
+	atom_concat(Where_Complement,'_',U_Where_Complement),
+	atom_concat(U_Where_Complement,Where,Complete_Where),
+
+	writeln('10'),
+	writeln('## Transformation 1 ##'),
+	writeln('Field Name: >> NOT INFORMED <<'),
+	write('Location Name: '),writeln(Complete_Where),!.
+
 
 %%Frase exemplo: 
 %%Please, add a new field in the customer form
@@ -333,7 +320,7 @@ t1 :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('12'),
+	writeln('11'),
 	writeln('## Transformation 1 ##'),
 	writeln('Field Name: >> NOT INFORMED <<'),
 	write('Location Name: '),writeln(Complete_Where),!.
@@ -352,7 +339,7 @@ t1 :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('13'),
+	writeln('12'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(What),
 	write('Location Name: '),writeln(Complete_Where),!.
@@ -369,13 +356,13 @@ t1 :-
 %Nega para a afirmar que o usuario indicou que quer adicionar um campo mas nao disse qual o nome do campo.
 	\+edge_dependence_basic(What,_,compound),
 
-	writeln('14'),
+	writeln('13'),
 	writeln('## Transformation 1 ##'),
 	writeln('Field Name: >> NOT INFORMED <<'),
 	write('Location Name: '),writeln(Where),!.
 
 %%Frase exemplo: 
-%%Please, add cell phone number field
+%%Please, add cell phone number field/Add age field
 t1 :-
 	verb(Verb),
 	is_synonym('add',Verb),
@@ -388,7 +375,7 @@ t1 :-
 	findall(X,edge_dependence_basic(What, X, compound),Z),
 	atomic_list_concat(Z, ' ', Complete_What),
 
-	writeln('15'),
+	writeln('14'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(Complete_What),
 	writeln('Location Name: >> NOT INFORMED <<'),!.
@@ -405,21 +392,24 @@ t1 :-
 
 	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds		
 	findall(X,edge_dependence_basic(What, X, compound),Z),
-	atomic_list_concat(Z, ' ', Complete_What),
+	atomic_list_concat(Z, ' ', What_Complement),
 
-	writeln('16'),
+	atom_concat(What_Complement,'_',U_What_Complement),
+	atom_concat(U_What_Complement,What,Complete_What),
+
+	writeln('15'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(Complete_What),
 	writeln('Location Name: >> NOT INFORMED <<'),!.
 
 %%Frase exemplo: 
-%%Please, add age field/Add age
+%%Please, add stauts/Add age
 t1 :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
 
-	writeln('17'),
+	writeln('16'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(What),
 	writeln('Location Name: >> NOT INFORMED <<'),!.
@@ -646,6 +636,10 @@ t2 :-
 	write('Field To Hide: '),writeln(Complete_What),
 	write('Location Name: >> NOT INFORMED <<'),!.
 
+%% Transformcao 3 'mudar posicao dos campos/paineis'
+
+
+
 %%Busca posicao do campo em uma lista
 
 posicao(Nome,0):-
@@ -657,6 +651,7 @@ posicao(Nome,1):-
 	arco(Id,_,next),
 	\+arco(_,Id,next).
 
+
 posicao(Nome,Posicao):-
 	nodo(Id,Nome,_),
 	arco(IdAnterior,Id,next),
@@ -664,6 +659,25 @@ posicao(Nome,Posicao):-
 	posicao(NomeAnterior,PosicaoAnterior),
 	Posicao is PosicaoAnterior + 1.
 
+
+ultima(Nome,0):-
+	\+ (nodo(_,Nome,Tipo),
+	memberchk(Tipo, ['form','panel','field'])).
+
+ultima(Nome,1):-
+	nodo(Id,Nome,_),
+	arco(_,Id,next),	
+	\+arco(Id,_,next).
+
+ultima(Nome,Posicao):-
+	nodo(Id,Nome,_),
+	arco(Id,IdPosterior,next),
+	nodo(IdPosterior,NomePosterior,_),
+	ultima(NomePosterior,PosicaoPosterior),
+	posicao(Nome,X),
+	writeln(X),
+	Posicao is PosicaoPosterior + 1.
+	%Posicao is Posicao + X.
 
 
 
