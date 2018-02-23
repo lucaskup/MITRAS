@@ -11642,9 +11642,9 @@ arco(6593,6594,'next').
 
 nodo(10000,preferred,field).
 nodo(10001,identifier,field).
-nodo(10002,identifierType,field).
+nodo(10002,'identifier type',field).
 nodo(10003,location,field).
-nodo(10004,createdBy,field).
+nodo(10004,'created By',field).
 nodo(10005,deleted,field).
 arco(10000,10001,next).
 arco(10001,10002,next).
