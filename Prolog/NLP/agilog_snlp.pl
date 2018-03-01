@@ -96,6 +96,7 @@ is_synonym(field,X) :-
 is_synonym(patient,X) :-
 	memberchk(X, ['users','patient','person','visits','encounters','providers','locations']).
 
+
 conv(Lang, Output) :-   
     (Lang = one ->
         Output = 1;
@@ -249,7 +250,7 @@ t1 :-
 	edge_dependence_basic(What,Adjective,amod),
 	edge_dependence_basic(What,Where,nmod),
 	edge_dependence_basic(Where,Where_Complement,compound),
-	is_synonym('field',What),
+	%is_synonym('field',What),
 	word(What,nn,_),		
 
 	atom_concat(Where_Complement,' ',U_Where_Complement),
@@ -541,7 +542,8 @@ t1 :-
 	write('Field Name: '),writeln(What),
 	writeln('Location Name: >> NOT INFORMED <<'),!.
 
-t1 :-	writeln('20'),
+t1 :-	debug,
+	writeln('20'),
 	writeln('O sistema nao encontrou dados relacionado a sua entrada, por favor revise os dados digitados.').
 	
 
