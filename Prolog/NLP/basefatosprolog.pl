@@ -11640,17 +11640,72 @@ arco(6591,6592,'has').
 arco(6592,6593,'next').
 arco(6593,6594,'next').
 
-nodo(11000,preferred,field).
-nodo(11001,identifier,field).
-nodo(11002,'identifier type',field).
-nodo(11003,location,field).
-nodo(11004,'created By',field).
-nodo(11005,deleted,field).
-arco(11000,10001,next).
-arco(11001,10002,next).
-arco(11002,10003,next).
-arco(11003,10004,next).
-arco(11004,10005,next).
+% Arcos de campos referenciando a ontologia
+
+arco(1000000,1000001,next).
+arco(1000001,1000002,next).
+arco(1000002,1000003,next).
+
+arco(1000004,1000005,next).
+arco(1000005,1000006,next).
+arco(1000006,1000007,next).
+
+arco(1000008,1000009,next).
+arco(1000009,1000010,next).
+arco(1000010,1000011,next).
+arco(1000011,1000012,next).
+arco(1000012,1000013,next).
+arco(1000013,1000014,next).
+arco(1000014,1000015,next).
+arco(1000015,1000016,next).
+arco(1000016,1000017,next).
+arco(1000017,1000018,next).
+arco(1000018,1000019,next).
+arco(1000019,1000020,next).
+arco(1000020,1000021,next).
+
+arco(1000022,1000023,next).
+arco(1000023,1000024,next).
+arco(1000024,1000025,next).
+arco(1000025,1000026,next).
+arco(1000026,1000027,next).
+
+arco(1000028,1000029,next).
+arco(1000029,1000030,next).
+arco(1000030,1000031,next).
+arco(1000031,1000032,next).
+arco(1000032,1000033,next).
+arco(1000033,1000034,next).
+
+arco(1000035,1000036,next).
+arco(1000036,1000037,next).
+arco(1000037,1000038,next).
+arco(1000038,1000039,next).
+arco(1000039,1000040,next).
+
+arco(1000041,1000042,next).
+arco(1000042,1000043,next).
+arco(1000043,1000044,next).
+arco(1000044,1000045,next).
+arco(1000045,1000046,next).
+arco(1000046,1000047,next).
+arco(1000047,1000048,next).
+arco(1000048,1000049,next).
+arco(1000049,1000050,next).
+arco(1000050,1000051,next).
+arco(1000051,1000052,next).
+arco(1000052,1000053,next).
+arco(1000053,1000054,next).
+arco(1000054,1000055,next).
+arco(1000055,1000056,next).
+
+arco(1000057,1000058,next).
+arco(1000058,1000059,next).
+arco(1000059,1000060,next).
+arco(1000060,1000061,next).
+arco(1000061,1000062,next).
+arco(1000062,1000063,next).
+
 
 /********************************************************
 *
@@ -11658,6 +11713,7 @@ arco(11004,10005,next).
 *
 */
 
+interfaceElelent(openMRS).
 
 interfaceElement(X) :- page(X).
 interfaceElement(X) :- panel(X).
@@ -11685,14 +11741,14 @@ panel(100008,deletePatient).
 
 field(1000000,preferred).
 field(1000001,identifier).
-field(1000002,identifierType).
+field(1000002,'identifier type').
 field(1000003,location).
 
 
 field(1000004,preferred).
 field(1000005,given).
 field(1000006,middle).
-field(1000007,familyName).
+field(1000007,'family name').
 
 
 field(1000008,preferred).
@@ -11715,51 +11771,51 @@ field(1000022,gender).
 field(1000023,birthdate).
 field(1000024,estimated).
 field(1000025,deceased).
-field(1000027,deleted).
-field(1000028,uuid).
+field(1000026,deleted).
+field(1000027,uuid).
 
 %% All patient form "editable" fields
-field(1000029,preferred).
-field(1000030,identifier).
-field(1000031,identifierType).
-field(1000032,location).
-field(1000033,createdBy).
-field(1000034,changedBy).
-field(1000035,deleted).
+field(1000028,preferred).
+field(1000029,identifier).
+field(1000030,'identifier type').
+field(1000031,location).
+field(1000032,createdBy).
+field(1000033,changedBy).
+field(1000034,deleted).
 
-field(1000036,preferred).
-field(1000037,given).
-field(1000038,middle).
-field(1000039,familyName).
-field(1000040,cretedBy).
-field(1000041,deleted).
+field(1000035,preferred).
+field(1000036,given).
+field(1000037,middle).
+field(1000038,'family name').
+field(1000039,'created by').
+field(1000040,deleted).
 
-field(1000042,preferred).
-field(1000043,address).
-field(1000044,section_homestead).
-field(1000045,estate_NearestCentre).
-field(1000046,sublocation).
-field(1000047,division).
-field(1000048,province).
-field(1000049,latitude).
-field(1000050,country).
-field(1000051,town_village).
-field(1000052,location).
-field(1000053,district).
-field(1000054,postalCode).
-field(1000055,longitude).
-field(1000056,createdBy).
-field(1000057,deleted).
+field(1000041,preferred).
+field(1000042,address).
+field(1000043,section_homestead).
+field(1000044,estate_NearestCentre).
+field(1000045,sublocation).
+field(1000046,division).
+field(1000047,province).
+field(1000048,latitude).
+field(1000049,country).
+field(1000050,town_village).
+field(1000051,location).
+field(1000052,district).
+field(1000053,'postal code').
+field(1000054,longitude).
+field(1000055,'created by').
+field(1000056,deleted).
 
-field(1000058,gender).
-field(1000059,birthdate).
-field(1000060,estimated).
-field(1000061,deceased).
-field(1000062,createdBy).
-field(1000063,deleted).
-field(1000064,uuid).
+field(1000057,gender).
+field(1000058,birthdate).
+field(1000059,estimated).
+field(1000060,deceased).
+field(1000061,'created by').
+field(1000062,deleted).
+field(1000063,uuid).
 
-field(1000065,reason).
+field(1000064,reason).
 
 %% Display panels in pages
 display(10000,100000).
@@ -11805,25 +11861,25 @@ display(100003,1000024).
 display(100003,1000025).
 display(100003,1000026).
 display(100003,1000027).
+
+%%Display fields in patient "editable" form
+
 display(100003,1000028).
-
-%%Display fields in patient "etditable" form
-
 display(100004,1000029).
 display(100004,1000030).
 display(100004,1000031).
 display(100004,1000032).
 display(100004,1000033).
 display(100004,1000034).
-display(100004,1000035).
 
+display(100004,1000035).
 display(100005,1000036).
 display(100005,1000037).
 display(100005,1000038).
 display(100005,1000039).
 display(100005,1000040).
-display(100005,1000041).
 
+display(100005,1000041).
 display(100006,1000042).
 display(100006,1000043).
 display(100006,1000044).
@@ -11839,14 +11895,14 @@ display(100006,1000053).
 display(100006,1000054).
 display(100006,1000055).
 display(100006,1000056).
-display(100006,1000057).
 
+display(100006,1000057).
 display(100007,1000058).
 display(100007,1000059).
 display(100007,1000060).
 display(100007,1000061).
 display(100007,1000062).
 display(100007,1000063).
-display(100007,1000064).
 
-display(100008,1000065).
+
+display(100007,1000064).
