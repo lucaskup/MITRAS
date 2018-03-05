@@ -85,13 +85,13 @@ is_synonym(hide,X) :-
 	memberchk(X, ['hide','delete','cover','exclude','destroy','annul','remove','erase','conceal']).
 
 is_synonym(move,X) :-
-	memberchk(X, ['move','change','put','attach','get']).
+	memberchk(X, ['move','change','put','attach','get','place','relocate','shift']).
 
 is_synonym(upper,X) :-
-	memberchk(X, ['upper']).
+	memberchk(X, ['upper','top']).
 
 is_synonym(last,X) :-
-	memberchk(X, ['last']).
+	memberchk(X, ['last','bottom']).
 
 is_synonym(new,X) :-
 	memberchk(X, ['new']).
@@ -151,7 +151,7 @@ conv2(Lang, Output) :-
 %%Frases exemplo: 
 %% Please, add an identity field in the customer register/Add age field on the customer form/Can I add a Cell Phone Number field on customer form?
 %% Please, add up an identity field in the customer register/Add up age field in the customer form/ May I add Cell Phone Number field in customer form?
-%% Include identity field in the customer register/ Create one more identity field / Create another identify field / Is it possible to add another identity field? 
+%% Include identity field in the customer register / Create one more identity field / Create another identify field / Is it possible to add another identity field? 
 %% How can/could I create an extra identity field? / Shall I add another field? 
 t1 :-
 	verb(Verb),
@@ -851,7 +851,7 @@ t2 :-
 	
 %%Frase exemplo:
 %%Please, move Identifier Type up/down one position
-%% Swap identity  for location / Switch identity in place of location / Move identity from customer register to patient indentifiers / Get identifier type to upper position / Get-place-relocate-shift-change-move identifier type to the top-bottom / Place identifier type in ... / Put address in between division and province / Place address between division and province / Relocate adress above-below division /   
+%% Swap identity  for location / Switch identity in place of location / Move identity from customer register to patient indentifiers / Get-place-relocate-shift-change-move identifier type to the top-bottom / Place identifier type in ... / Put address in between division and province / Place address between division and province / Relocate adress above-below division /   
 
 t3 :-
 	verb(Verb),
@@ -1166,7 +1166,7 @@ t3 :-
 	write('Going To Position: '),writeln(UltimaPos),!.
 
 %%Frase exemplo:
-%%Get Identifier to last position
+%%Get Identifier to the last position
 
 t3 :-
 	verb(Verb),
@@ -1183,6 +1183,143 @@ t3 :-
 	writeln('## Transformation 3 ##'),
 	write('Field To Move: '),writeln(What),
 	write('Going To Position: '),writeln(UltimaPos),!.
+
+%%Frase exemplo:
+%%Get Identifier Type to the top
+
+t3 :-
+	verb(Verb),
+	is_synonym('move',Verb),
+ 	edge_dependence_basic(Verb,What,dobj),
+
+	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds	
+	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
+	atomic_list_concat(List_Compound_What, ' ',Compound_What),
+
+	atom_concat(Compound_What,' ',U_What_Complement),
+	atom_concat(U_What_Complement,What,Complete_What),
+	
+	idCampo(Complete_What,_),
+	edge_dependence_basic(Verb,Nominal,nmod),
+	edge_dependence_basic(Nominal,_,case),
+	is_synonym('upper',Nominal),
+	
+	writeln('17'),
+	writeln('## Transformation 3 ##'),
+	write('Field To Move: '),writeln(Complete_What),
+	write('Going To Position: '),writeln('1'),!.
+
+%%Frase exemplo:
+%%Get Identifier Type field to the top
+
+t3 :-
+	verb(Verb),
+	is_synonym('move',Verb),
+ 	edge_dependence_basic(Verb,What,dobj),
+
+	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds	
+	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
+	atomic_list_concat(List_Compound_What, ' ',Compound_What),
+	
+	idCampo(Compound_What,_),
+	edge_dependence_basic(Verb,Nominal,nmod),
+	edge_dependence_basic(Nominal,_,case),
+	is_synonym('upper',Nominal),
+	
+	writeln('18'),
+	writeln('## Transformation 3 ##'),
+	write('Field To Move: '),writeln(Compound_What),
+	write('Going To Position: '),writeln('1'),!.
+
+%%Frase exemplo:
+%%Get Identifier to the top
+
+t3 :-
+	verb(Verb),
+	is_synonym('move',Verb),
+ 	edge_dependence_basic(Verb,What,dobj),
+
+	
+	idCampo(What,_),
+	edge_dependence_basic(Verb,Nominal,nmod),
+	edge_dependence_basic(Nominal,_,case),
+	is_synonym('upper',Nominal),
+	
+	writeln('19'),
+	writeln('## Transformation 3 ##'),
+	write('Field To Move: '),writeln(What),
+	write('Going To Position: '),writeln('1'),!.
+
+%%Frase exemplo:
+%%Get Identifier Type to the bottom
+
+t3 :-
+	verb(Verb),
+	is_synonym('move',Verb),
+ 	edge_dependence_basic(Verb,What,dobj),
+
+	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds	
+	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
+	atomic_list_concat(List_Compound_What, ' ',Compound_What),
+
+	atom_concat(Compound_What,' ',U_What_Complement),
+	atom_concat(U_What_Complement,What,Complete_What),
+	
+	idCampo(Complete_What,Id),
+	edge_dependence_basic(Verb,Nominal,nmod),
+	edge_dependence_basic(Nominal,_,case),
+	is_synonym('last',Nominal),
+	ultima(Id,UltimaPos),
+	
+	writeln('20'),
+	writeln('## Transformation 3 ##'),
+	write('Field To Move: '),writeln(Complete_What),
+	write('Going To Position: '),writeln(UltimaPos),!.
+
+%%Frase exemplo:
+%%Get Identifier Type field to the bottom
+
+t3 :-
+	verb(Verb),
+	is_synonym('move',Verb),
+ 	edge_dependence_basic(Verb,What,dobj),
+
+	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds	
+	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
+	atomic_list_concat(List_Compound_What, ' ',Compound_What),
+	
+	idCampo(Compound_What,Id),
+	edge_dependence_basic(Verb,Nominal,nmod),
+	edge_dependence_basic(Nominal,_,case),
+	is_synonym('last',Nominal),
+	ultima(Id,UltimaPos),
+	
+	writeln('21'),
+	writeln('## Transformation 3 ##'),
+	write('Field To Move: '),writeln(Compound_What),
+	write('Going To Position: '),writeln(UltimaPos),!.
+
+%%Frase exemplo:
+%%Get Identifier to the bottom
+
+t3 :-
+	verb(Verb),
+	is_synonym('move',Verb),
+ 	edge_dependence_basic(Verb,What,dobj),
+
+	
+	idCampo(What,Id),
+	edge_dependence_basic(Verb,Nominal,nmod),
+	edge_dependence_basic(Nominal,_,case),
+	is_synonym('last',Nominal),
+	ultima(Id,UltimaPos),
+	
+	writeln('22'),
+	writeln('## Transformation 3 ##'),
+	write('Field To Move: '),writeln(What),
+	write('Going To Position: '),writeln(UltimaPos),!.
+
+
 
 %%Frase exemplo:
 %%Put preferred in between Identifier Type and Location (Nao esta pronta)
