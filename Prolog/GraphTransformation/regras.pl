@@ -141,9 +141,9 @@ source_injection(t1,ClassName,AttributeName,Lines) :-
 %%%    openmrs-module-legacyui-master\omod\src\main\resources\webModuleApplicationContext.xml -> adicionar o campo novo ao xml pois a tela é criada dinâmicamente
 %%%    legacyui-omod/src/main/java/org/openmrs/web/controller/person/PersonFormController.java -> Controller do form, precisa ser atualizado com o novo campo
 
-t1_applyTransformation(NomePivo, NomeAtributo) :-
-    t1_matchStep(NomePivo,Id),
-    t1_productionStep(Id,NomeAtributo),
+t1_applyTransformation(Id_pivo, NomeAtributo) :-
+    t1_matchStep(NomePivo,Id_pivo),
+    t1_productionStep(Id_pivo,NomeAtributo),
     source_injection(t1,NomePivo,NomeAtributo,_).
 
 t1_matchStep(NomePivo,Id) :-
@@ -162,7 +162,26 @@ t1_matchStep(NomePivo,Id) :-
     nodo(IdMessagesConf,_,'messages'),% configuração
 
     arco(IdPai,IdWebConf,'config'), %Esse arquivo armazena a extrutura da tela
-    nodo(IdWebConf,_,'webConf'). % deve ser atualizado também
+    nodo(IdWebConf,_,'webConf'),!. % deve ser atualizado também
+
+t1_matchStep(NomePivo,Id) :-
+    arco(Id,IdPivo,'show'),
+    nodo(IdPivo,NomePivo,'class'), %Classe pivot para o match, seria a classe model (Person)
+    
+    arco(IdPai,IdPivo,'association'),% Classe também de model, quando a classe principal
+    nodo(IdPai,_,'class'),     % possui associacao para uma segunda. Exemplo relacao 1-n 
+    
+    arco(IdController,IdPai,'controller'),% Verifica tambem a existência de um vinculo 
+    nodo(IdController,_,'class'),      % com controller
+
+    arco(IdPai,IdHibernateConf,'config'),      %Para adição de campos a classe deve
+    nodo(IdHibernateConf,_,'hibernateConf'),%estar mapeada no hibernate
+
+    arco(IdPai,IdMessagesConf,'config'), % A descrição dos campos novos fica em arquivo de 
+    nodo(IdMessagesConf,_,'messages'),% configuração
+
+    arco(IdPai,IdWebConf,'config'), %Esse arquivo armazena a extrutura da tela
+    nodo(IdWebConf,_,'webConf'),!. % deve ser atualizado também
 
 t1_productionStep(IdClasseAdd,NomeAtributo) :- 
     ultimoId(IdNovoAtributo), %Adiciona o atributo ao grafo

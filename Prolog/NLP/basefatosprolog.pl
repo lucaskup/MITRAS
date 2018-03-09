@@ -11640,7 +11640,143 @@ arco(6591,6592,'has').
 arco(6592,6593,'next').
 arco(6593,6594,'next').
 
-% Arcos de campos referenciando a ontologia
+
+% Nodos de campos da interface gráfica
+
+nodo(10000,patientForm,'form').
+nodo(10001,patientFormEdit,'form').
+
+%%Patient Form
+nodo(100000,patientIdentifiers,'panel').
+nodo(100001,patientNames,'panel').
+nodo(100002,patientAddresses,'panel').
+nodo(100003,patientInformation,'panel').
+
+%%Patient Form "Editable"
+
+nodo(100004,patientIdentifiers,'panel').
+nodo(100005,patientNames,'panel').
+nodo(100006,patientAddresses,'panel').
+nodo(100007,patientInformation,'panel').
+nodo(100008,deletePatient,'panel').
+
+
+%%All Patient Form fields 
+
+nodo(1000000,preferred,'field').
+nodo(1000001,identifier,'field').
+nodo(1000002,identifier_type,'field').
+nodo(1000003,location,'field').
+
+
+nodo(1000004,preferred,'field').
+nodo(1000005,given,'field').
+nodo(1000006,middle,'field').
+nodo(1000007,family_name,'field').
+
+
+nodo(1000008,preferred,'field').
+nodo(1000009,address,'field').
+nodo(1000010,section_homestead,'field').
+nodo(1000011,estate_NearestCentre,'field').
+nodo(1000012,sublocation,'field').
+nodo(1000013,division,'field').
+nodo(1000014,province,'field').
+nodo(1000015,latitude,'field').
+nodo(1000016,country,'field').
+nodo(1000017,town_village,'field').
+nodo(1000018,location,'field').
+nodo(1000019,district,'field').
+nodo(1000020,postalCode,'field').
+nodo(1000021,longitude,'field').
+
+
+nodo(1000022,gender,'field').
+nodo(1000023,birthdate,'field').
+nodo(1000024,estimated,'field').
+nodo(1000025,deceased,'field').
+nodo(1000026,deleted,'field').
+nodo(1000027,uuid,'field').
+
+%% All patient form "editable" fields
+nodo(1000028,preferred,'field').
+nodo(1000029,identifier,'field').
+nodo(1000030,identifier_type,'field').
+nodo(1000031,location,'field').
+nodo(1000032,createdBy,'field').
+nodo(1000033,changedBy,'field').
+nodo(1000034,deleted,'field').
+
+nodo(1000035,preferred,'field').
+nodo(1000036,given,'field').
+nodo(1000037,middle,'field').
+nodo(1000038,family_name,'field').
+nodo(1000039,created_by,'field').
+nodo(1000040,deleted,'field').
+
+nodo(1000041,preferred,'field').
+nodo(1000042,address,'field').
+nodo(1000043,section_homestead,'field').
+nodo(1000044,estate_NearestCentre,'field').
+nodo(1000045,sublocation,'field').
+nodo(1000046,division,'field').
+nodo(1000047,province,'field').
+nodo(1000048,latitude,'field').
+nodo(1000049,country,'field').
+nodo(1000050,town_village,'field').
+nodo(1000051,location,'field').
+nodo(1000052,district,'field').
+nodo(1000053,postal_code,'field').
+nodo(1000054,longitude,'field').
+nodo(1000055,created_by,'field').
+nodo(1000056,deleted,'field').
+
+nodo(1000057,gender,'field').
+nodo(1000058,birthdate,'field').
+nodo(1000059,estimated,'field').
+nodo(1000060,deceased,'field').
+nodo(1000061,created_by,'field').
+nodo(1000062,deleted,'field').
+nodo(1000063,uuid,'field').
+
+nodo(1000064,reason,'field').
+
+
+% Arcos de campos da interface gráfica
+
+
+%Controller da entidade
+arco(1000065,2892,'controller'). 
+nodo(1000065,'PersonFormController','class').
+
+%Configuração da classe, referente a persistência
+arco(2892,1000066,'config').
+nodo(1000066,'PersonName.hbm.xml','hibernateConf').
+
+%Configuração da classe, referente a exibição em tela
+arco(2892,1000067,'config'). % A descrição dos campos novos fica em arquivo de 
+nodo(1000067,'messages.properties','messages').% configuração
+
+arco(2892,1000068,'config').%Esse arquivo armazena a extrutura da tela
+nodo(1000068,'ArquivoWeb.xml','webConf').% deve ser atualizado também
+
+
+%Patient Form mostra Patient
+arco(10000,4006,'show').
+%Patient Form Edit mostra Patient
+arco(10001,4006,'show').
+%Names Panel mostra PersonName
+arco(100001,3055,'show').
+
+%Campo preferred mostra o atributo preferred
+arco(1000004,3058,'show').
+%Campo given name mostra o atributo given name
+arco(1000005,3060,'show').
+%Campo middle name mostra o atributo middle name
+arco(1000006,3061,'show').
+%Campo family name mostra o atributo family name
+arco(1000007,3063,'show').
+
 
 arco(1000000,1000001,next).
 arco(1000001,1000002,next).
@@ -11713,11 +11849,15 @@ arco(1000062,1000063,next).
 *
 */
 
+display(X,Y) :-
+	display(X,Z),
+	display(Z,Y).
+
 interfaceElelent(openMRS).
 
-interfaceElement(X) :- page(X).
-interfaceElement(X) :- panel(X).
-interfaceElement(X) :- field(X).
+interfaceElement(X,Y) :- page(X,Y).
+interfaceElement(X,Y) :- panel(X,Y).
+interfaceElement(X,Y) :- field(X,Y).
 
 page(10000,patientForm).
 page(10001,patientFormEdit).
@@ -11906,3 +12046,4 @@ display(100007,1000063).
 
 
 display(100007,1000064).
+
