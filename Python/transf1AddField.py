@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import sys
+
 # Recebe path, nome da classe, nome do atributo, getter e setter para efetuar a injecao 1
 print('Number of arguments:', len(sys.argv), 'arguments.')
 parametros = sys.argv
@@ -16,12 +17,12 @@ setterName = parametros[5]
 
 
 import os, os.path
-
+#print('Teste classe: '+className + '.java')
 for root, dirs, files in os.walk(sourcePath):
     for f in files:
         fullpath = os.path.join(root, f)
-        #print(fullpath.split('\\')[-1])
-        if fullpath.split('\\')[-1] == className + '.java':
+        #print(fullpath.split(os.sep)[-1])
+        if fullpath.split(os.sep)[-1] == className + '.java':
             print(fullpath)
             with open(fullpath) as f:
                 content = f.readlines()
@@ -38,7 +39,7 @@ for root, dirs, files in os.walk(sourcePath):
                         sourceFile.write('public void '+ setterName+ '(String '+attributeName+') {'+'\n')
                         sourceFile.write('    this.'+ attributeName +' = '+ attributeName+';\n}\n')
 
-        if fullpath.split('\\')[-1] == className + '.hbm.xml':
+        if fullpath.split(os.sep)[-1] == className + '.hbm.xml':
             print('configuracao: ' + fullpath)
             with open(fullpath) as f:
                 content = f.readlines()
@@ -51,7 +52,7 @@ for root, dirs, files in os.walk(sourcePath):
                         sourceFile.write('access="field" column="'+attributeName+'" length="50" />'+'\n')
                     sourceFile.write(line+'\n')
 
-        if fullpath.split('\\')[-1] == 'webModuleApplicationContext.xml':
+        if fullpath.split(os.sep)[-1] == 'webModuleApplicationContext.xml':
             print('Tela: ' + fullpath)
             with open(fullpath) as f:
                 content = f.readlines()
@@ -116,7 +117,7 @@ for root, dirs, files in os.walk(sourcePath):
                     
 
 
-        if fullpath.split('\\')[-1] == 'PersonFormController.java':
+        if fullpath.split(os.sep)[-1] == 'PersonFormController.java':
             print('Controller: ' + fullpath)
             with open(fullpath) as f:
                 content = f.readlines()
