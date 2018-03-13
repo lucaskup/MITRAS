@@ -101,6 +101,8 @@ is_synonym(field,X) :-
 
 is_synonym(patient,X) :-
 	memberchk(X, ['users','patient','person','visits','encounters','providers','locations']).
+is_synonym(name_panel,X) :-
+	memberchk(X,['patientNames']).
 
 conv(Lang, Output) :-   
     (Lang = one ->
@@ -151,9 +153,9 @@ conv2(Lang, Output) :-
 %%Frases exemplo: 
 %% Please, add an identity field in the customer register/Add age field on the customer form/Can I add a Cell Phone Number field on customer form?
 %% Please, add up an identity field in the customer register/Add up age field in the customer form/ May I add Cell Phone Number field in customer form?
-%% Include identity field in the customer register / Create one more identity field / Create another identify field / Is it possible to add another identity field? 
+%% Include identity field in the customer register/ Create one more identity field / Create another identify field / Is it possible to add another identity field? 
 %% How can/could I create an extra identity field? / Shall I add another field? 
-t1 :-
+t1(Complete_Where,Complete_What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
@@ -179,7 +181,7 @@ t1 :-
 %%Frases exemplo: 
 %% VERIFICAR NECESSIDADE PELO FATO DAS MAIUSCULAS.
 %% Please, add a cell phone number field in customer register/I would like to create a cell phone number field on customer form
-t1 :-
+t1(Complete_Where,Complete_What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
@@ -206,7 +208,7 @@ t1 :-
 %% Praticamente a mesma regra que a anterior, mas como nao temos a palavra field, a verificacao tem que ser diferente
 %%Frase exemplo: 
 %% Please, add a cell phone number in customer register
-t1 :-
+t1(Id,Complete_What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
@@ -220,10 +222,10 @@ t1 :-
 	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
 	atomic_list_concat(List_Compound_What, ' ',Compound_What),	
 
-	atom_concat(Compound_What,' ',U_What_Complement),
+	atom_concat(Compound_What,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 
-	atom_concat(Where_Complement,' ',U_Where_Complement),
+	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
 	writeln('3'),
@@ -234,7 +236,7 @@ t1 :-
 %%Frase exemplo: 
 %% VERIFICAR NECESSIDADE PELO FATO DAS MAIUSCULAS
 %% Please, add identity field in the customer register
-t1 :-
+t1(Complete_Where,What_Complement) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
@@ -242,7 +244,7 @@ t1 :-
 	edge_dependence_basic(Verb,Where,nmod),
 	edge_dependence_basic(Where,Where_Complement,compound),
 
-	atom_concat(Where_Complement,' ',U_Where_Complement),
+	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
 	writeln('4'),
@@ -253,7 +255,7 @@ t1 :-
 
 %% Frase exemplo:
 %% I need a field for secret name in the patient form
-t1 :- 
+t1(Id,Complete_What) :- 
 	adjective(Adjective),
 	edge_dependence_basic(What,Adjective,amod),
 	edge_dependence_basic(What,Where,nmod),
@@ -261,22 +263,24 @@ t1 :-
 	%is_synonym('field',What),
 	word(What,nn,_),		
 
-	atom_concat(Where_Complement,' ',U_Where_Complement),
+	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	atom_concat(Adjective,' ',U_What_Complement),
+	atom_concat(Adjective,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 
 	writeln('5'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(Complete_What),
-	write('Location Name: '),writeln(Complete_Where),!.
+	write('Location Name: '),writeln(Complete_Where),
+	is_synonym(Complete_Where,Ontology_name),
+	interfaceElement(Id,Ontology_name),!.
 
 
 %%Frase exemplo: 
 %%Please, add a new field for secret name in the customer form
 
-t1 :-
+t1(Complete_Where,Complete_What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,Where,nmod),
@@ -299,7 +303,7 @@ t1 :-
 
 %%Frase exemplo: 
 %% Please, add a phone number field in the person/Add a document field in the patient
-t1 :-
+t1(Where,Complete_What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
@@ -312,7 +316,7 @@ t1 :-
 
 	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds		
 	findall(X,edge_dependence_basic(What, X, compound),Z),
-	atomic_list_concat(Z, ' ', Complete_What),
+	atomic_list_concat(Z, '_', Complete_What),
 	
 	writeln('7'),
 	writeln('## Transformation 1 ##'),
@@ -322,7 +326,7 @@ t1 :-
 %%Frase exemplo: 
 %% Aqui usuario indica nome do local como registro ou algo parecido sem mencionar qual tipo especifico
 %% Please, add a document field in the register/Add a document field in the register
-t1 :-
+t1(' ',What_Complement) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
@@ -336,7 +340,7 @@ t1 :-
 
 %%Frase exemplo: 
 %%Please, add age in the customer form
-t1 :-
+t1(Complete_Where,What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
@@ -354,7 +358,7 @@ t1 :-
 
 %%Frase exemplo:
 %%Please, add up Form/Age in the customer form
-t1 :-
+t1(Complete_Where, What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
@@ -373,7 +377,7 @@ t1 :-
 
 %%Frase exemplo: 
 %%Put a new information in costumer register
-t1 :-
+t1(Complete_Where, ' ') :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,Ligacao,dobj),
@@ -391,7 +395,7 @@ t1 :-
 
 %%Frase exemplo: 
 %%Please, add a new field in the customer form
-t1 :-
+t1(Complete_Where, ' ') :-
 	verb(X),
 	is_synonym('add',X),
 	edge_dependence_basic(X,Where,nmod),
@@ -407,7 +411,7 @@ t1 :-
 
 %Frase exemplo:
 %Create a field called Phone Number on the customer register
-t1 :-
+t1(Complete_Where, Complete_What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,Ligacao,dobj),
@@ -422,9 +426,9 @@ t1 :-
 	
 	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds		
 	findall(X,edge_dependence_basic(What, X, compound),Z),
-	atomic_list_concat(Z, ' ', Compound_What),
+	atomic_list_concat(Z, '_', Compound_What),
 
-	atom_concat(Compound_What,' ',U_What_Complement),
+	atom_concat(Compound_What,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 
 	atom_concat(Where_Complement,'_',U_Where_Complement),
@@ -437,7 +441,7 @@ t1 :-
 
 %Frase exemplo:
 %Create a field called name on the customer register
-t1 :-
+t1(Complete_Where, What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,Ligacao,dobj),
@@ -457,7 +461,7 @@ t1 :-
 
 %Frase exemplo:
 %Create a field called name on the customer register
-t1 :-
+t1(Complete_Where, What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,Ligacao,dobj),
@@ -476,7 +480,7 @@ t1 :-
 
 %%Frase exemplo: 
 %%Please, add cell phone number field/Add age field
-t1 :-
+t1(' ', Complete_What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
@@ -486,7 +490,7 @@ t1 :-
 
 	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds		
 	findall(X,edge_dependence_basic(What, X, compound),Z),
-	atomic_list_concat(Z, ' ', Complete_What),
+	atomic_list_concat(Z, '_', Complete_What),
 
 	writeln('16'),
 	writeln('## Transformation 1 ##'),
@@ -495,7 +499,7 @@ t1 :-
 
 %%Frase exemplo: 
 %%Please, add cell phone number
-t1 :-
+t1(' ', Complete_What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
@@ -505,7 +509,7 @@ t1 :-
 
 	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds		
 	findall(X,edge_dependence_basic(What, X, compound),Z),
-	atomic_list_concat(Z, ' ', What_Complement),
+	atomic_list_concat(Z, '_', What_Complement),
 
 	atom_concat(What_Complement,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
@@ -517,7 +521,7 @@ t1 :-
 
 %%Frase exemplo: 
 %%I would like to create a field called Identity Card
-t1 :-
+t1(' ', Complete_What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	%is_synonym('field',What),
@@ -530,9 +534,9 @@ t1 :-
 
 	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds		
 	findall(X,edge_dependence_basic(What, X, compound),Z),
-	atomic_list_concat(Z, ' ', Compound_What),
+	atomic_list_concat(Z, '_', Compound_What),
 
-	atom_concat(Compound_What,' ',U_What_Complement),
+	atom_concat(Compound_What,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 	
 	writeln('18'),
@@ -542,7 +546,7 @@ t1 :-
 
 %%Frase exemplo: 
 %%I would like to create a field called age
-t1 :-
+t1(' ', What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	%is_synonym('field',What),
@@ -557,7 +561,7 @@ t1 :-
 
 %%Frase exemplo: 
 %%Please, add stauts/Add age
-t1 :-
+t1(' ', What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
@@ -851,7 +855,7 @@ t2 :-
 	
 %%Frase exemplo:
 %%Please, move Identifier Type up/down one position
-%% Swap identity  for location / Switch identity in place of location / Move identity from customer register to patient indentifiers / Get-place-relocate-shift-change-move identifier type to the top-bottom / Place identifier type in ... / Put address in between division and province / Place address between division and province / Relocate adress above-below division /   
+%% Swap identity  for location / Switch identity in place of location / Move identity from customer register to patient indentifiers / Get identifier type to upper position / Get-place-relocate-shift-change-move identifier type to the top-bottom / Place identifier type in ... / Put address in between division and province / Place address between division and province / Relocate adress above-below division /   
 
 t3 :-
 	verb(Verb),
@@ -1166,7 +1170,7 @@ t3 :-
 	write('Going To Position: '),writeln(UltimaPos),!.
 
 %%Frase exemplo:
-%%Get Identifier to the last position
+%%Get Identifier to last position
 
 t3 :-
 	verb(Verb),
