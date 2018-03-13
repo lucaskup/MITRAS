@@ -1,12 +1,15 @@
-path_source('D:\\Users\\Lucas\\TesteDissertacao').
-path_python_inj('D:\\Users\\Lucas\\Google Drive\\Documentos\\Unisinos\\Mestrado\\').
+path_source('/home/lucas/Downloads/Source/').
+path_python_inj('/home/lucas/Downloads/Code/MITRAS/Python/').
 
 
 run_python(Script,Option,Lines):-
+    writeln('Running Python Script... '),
+    append([Script],Option,Lista),
     setup_call_cleanup(
-    process_create(path(python),[Script|Option],[stdout(pipe(Out))]),
+    process_create(path(python3),Lista,[stdout(pipe(Out))]),
     read_lines(Out,Lines),
-    close(Out)).
+    close(Out)),
+    debug -> maplist(writeln,Lines).
 
 read_lines(Out, Lines) :-
         read_line_to_codes(Out, Line1),
@@ -126,6 +129,8 @@ nomeGetterSetter(Atributo,NomeGetter,NomeSetter) :-
 
 
 source_injection(t1,ClassName,AttributeName,Lines) :- 
+    write('Source Injection T1: '),
+    write(ClassName),write(' '),writeln(AttributeName),
     path_python_inj(PathPython),
     atom_concat(PathPython,'transf1AddField.py',PyAddField),
     path_source(SourcePath),
