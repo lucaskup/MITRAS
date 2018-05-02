@@ -34,6 +34,14 @@ snlp_assert_pos_tag(N) :-
 	retractall(word(_,_,_)),
 	maplist(assertz,ListTerm).
 
+snlp_assert_ner_tag(N) :-
+	N::getNers([]) => Nes, 
+	array::Nes=>List,
+	maplist(term_string,ListTerm,List),
+	writeln(ListTerm),
+	retractall(ner(_,_,_)),
+	maplist(assertz,ListTerm).
+
 %snlp_assert_parse_tree(N) :-
 %	N::getParseTree([]) => ParseTree,
 %	term_string(ParseTreeTerm,ParseTree),
@@ -63,7 +71,7 @@ snlp_assert_basic_dependence_tree(N) :-
 snlp_parse(Txt) :- 
 	new::'agilog.snlp.SNLPPrologAdapter'([Txt]) => N,
 	snlp_assert_pos_tag(N),
-	%snlp_assert_parse_tree(N),
+	snlp_assert_ner_tag(N),
 	snlp_assert_dependence_tree(N),
 	snlp_assert_basic_dependence_tree(N).
 
@@ -104,7 +112,7 @@ is_synonym(patient,X) :-
 is_synonym(name_panel,X) :-
 	memberchk(X,['patientNames']).
 
-conv(Lang, Output) :-   
+/*conv(Lang, Output) :-   
     (Lang = one ->
         Output = 1;
     Lang = two ->
@@ -146,7 +154,7 @@ conv2(Lang, Output) :-
     Lang = ninth ->
         Output = 9;
     Lang = tenth ->
-        Output = 10).
+        Output = 10).*/
 
 
 %Predicado para checar existencia do elemento na ONTOLOGIA e buscar o ID correspondente
@@ -332,7 +340,7 @@ t1(Id,Complete_What) :-
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '), writeln(Complete_What),
 	write('Location Name: '),writeln(Where),
-	check_id_ontology(Complete_Where,Id),!.
+	check_id_ontology(Where,Id),!.
 
 %%Frase exemplo: 
 %% Aqui usuario indica nome do local como registro ou algo parecido sem mencionar qual tipo especifico
@@ -893,7 +901,8 @@ t3 :-
 	edge_dependence_basic(Nominal,Elipsed,nummod),
 	idCampo(Complete_What,Id),
 	posicao(Id,Position),
-	conv(Elipsed,Numeral),
+	ner(Elipsed,Numeral,_),
+	%%conv(Elipsed,Numeral),
 	inf('1',Inflaction,Complete_What,Position,Numeral),!.
 	
 
@@ -914,7 +923,8 @@ t3 :-
 	edge_dependence_basic(Nominal,Elipsed,nummod),
 	idCampo(Compound_What,Id),
 	posicao(Id,Position),
-	conv(Elipsed,Numeral),
+	ner(Elipsed,Numeral,_),
+	%%conv(Elipsed,Numeral),
 	inf('2',Inflaction,Compound_What,Position,Numeral),!.
 
 %%Move Identifier Type field up/down one position
@@ -933,7 +943,8 @@ t3 :-
  	edge_dependence_basic(Dep,Elipsed,nummod),
 	idCampo(Compound_What,Id),
 	posicao(Id,Position),
-	conv(Elipsed,Numeral),
+	ner(Elipsed,Numeral,_),	
+	%%conv(Elipsed,Numeral),
 
 	inf('3',Inflaction,Compound_What,Position,Numeral),!.
 
@@ -951,7 +962,8 @@ t3 :-
 	edge_dependence_basic(Nominal,Elipsed,nummod),
 	idCampo(What_Complement,Id),
 	posicao(Id,Position),
-	conv(Elipsed,Numeral),
+	ner(Elipsed,Numeral,_),
+	%%conv(Elipsed,Numeral),
 	inf('4',Inflaction,What_Complement,Position,Numeral),!.
 
 %%Frase exemplo:
@@ -967,7 +979,8 @@ t3 :-
  	edge_dependence_basic(Dep,Elipsed,nummod),
 	idCampo(What_Complement,Id),
 	posicao(Id,Position),
-	conv(Elipsed,Numeral),
+	ner(Elipsed,Numeral,_),
+	%%conv(Elipsed,Numeral),
 	inf('5',Inflaction,What_Complement,Position,Numeral),!.
 
 
@@ -983,7 +996,8 @@ t3 :-
 	edge_dependence_basic(Nominal,Elipsed,nummod),
 	idCampo(What,Id),
 	posicao(Id,Position),
-	conv(Elipsed,Numeral),
+	%%conv(Elipsed,Numeral),
+	ner(Elipsed,Numeral,_),
 	inf('6',Inflaction,What,Position,Numeral),!.
 
 %%Frase exemplo:
@@ -1004,7 +1018,8 @@ t3 :-
 	
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,Numerals,amod),
-	conv2(Numerals,Ordinal),
+	ner(Numerals,Ordinal,_),
+	%%conv2(Numerals,Ordinal),
 	idCampo(Complete_What,_),
 		
 	writeln('7'),
@@ -1026,7 +1041,8 @@ t3 :-
 	
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,Numerals,amod),
-	conv2(Numerals,Ordinal),
+	ner(Numerals,Ordinal,_),
+	%%conv2(Numerals,Ordinal),
 	idCampo(Compound_What,_),
 		
 	writeln('8'),
@@ -1045,7 +1061,8 @@ t3 :-
 	
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,Numerals,amod),
-	conv2(Numerals,Ordinal),
+	ner(Numerals,Ordinal,_),	
+	%%conv2(Numerals,Ordinal),
 	idCampo(What_Complement,_),
 		
 	writeln('9'),
@@ -1063,7 +1080,8 @@ t3 :-
 	
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,Numerals,amod),
-	conv2(Numerals,Ordinal),
+	ner(Numerals,Ordinal,_),	
+	%%conv2(Numerals,Ordinal),
 	idCampo(What,_),
 		
 	writeln('10'),

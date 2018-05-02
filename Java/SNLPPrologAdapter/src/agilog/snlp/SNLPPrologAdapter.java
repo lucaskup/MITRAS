@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import edu.stanford.nlp.ling.CoreAnnotations.NormalizedNamedEntityTagAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
@@ -19,6 +20,8 @@ import edu.stanford.nlp.util.CoreMap;
 
 public class SNLPPrologAdapter {
 	private String[] words;
+	private String[] ners;
+
 	private String parseTree;
 	private String[] dependenceGraph;
 	
@@ -40,12 +43,15 @@ public class SNLPPrologAdapter {
 		return this.words;
 	}
 
+	public String[] getNers() {
+		return this.ners;
+	}
 	public SNLPPrologAdapter(String text) {
 		
 		// creates a StanfordCoreNLP object, with POS tagging, lemmatization, NER,
 		// parsing, and coreference resolution
 		Properties props = new Properties();
-		props.setProperty("annotators", "tokenize, ssplit, pos, depparse");
+		props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, depparse");
 		//props.setProperty("tokenize.language", "en");
 		//props.setProperty("parse.model", "edu/stanford/nlp/models/srparser/englishSR.ser.gz");
 		//props.setProperty("parse.model", "edu/stanford/nlp/models/srparser/englishSR.ser.gz");
@@ -54,6 +60,8 @@ public class SNLPPrologAdapter {
 		//props.setProperty("coref.md.type", "dep");
 		//props.setProperty("annotators", "tokenize, ssplit, pos, parse");
 		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+		
+		
 
 		// create an empty Annotation just with the given text
 		Annotation document = new Annotation(text);
@@ -67,9 +75,12 @@ public class SNLPPrologAdapter {
 		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
 		//Tree tree = null;
 		SemanticGraph dependencies = null;
-		ArrayList<String> vetor = new ArrayList<>();
+		ArrayList<String> vetorPOS = new ArrayList<>();
+		ArrayList<String> vetorNER = new ArrayList<>();
+
 
 		words = new String[1];
+		ners = new String[1];
 		for (CoreMap sentence : sentences) {
 			// traversing the words in the current sentence
 			// a CoreLabel is a CoreMap with additional token-specific methods
@@ -79,11 +90,18 @@ public class SNLPPrologAdapter {
 				// this is the POS tag of the token
 				String pos = token.get(PartOfSpeechAnnotation.class);
 				// this is the NER label of the token
-				//String ne = token.get(NamedEntityTagAnnotation.class);
-
+				String ne = token.get(NormalizedNamedEntityTagAnnotation.class);
+				System.out.println(ne);
 				// Monta o predicado das palavras com a extrutura palavra,pos tag e ne tag
-				vetor.add("word(" + word.toLowerCase() + "," + pos.toLowerCase() + "," + "0" + ").");
-
+				vetorPOS.add("word(" + word.toLowerCase() + "," + pos.toLowerCase() + "," + "0" + ").");
+				
+				String[] numeroInt = {"0"};
+				if(ne != null){
+				String temp = ne.replace('.','#');
+				numeroInt = temp.split("#");
+				}
+				vetorNER.add("ner(" + word.toLowerCase() + "," + numeroInt[0] + "," + "0" + ").");
+				
 			}
 
 			// this is the parse tree of the current sentence
@@ -148,7 +166,9 @@ public class SNLPPrologAdapter {
 			this.basicDependenceGraph = grafoDependenciasBasica.toArray(this.basicDependenceGraph);
 			System.out.println(dependencies.edgeListSorted());
 		}
-		this.words = vetor.toArray(this.words);
+		this.words = vetorPOS.toArray(this.words);
+		this.ners = vetorNER.toArray(this.ners);
+		
 		// This is the coreference link graph
 		// Each chain stores a set of mentions that link to each other,
 		// along with a method for getting the most representative mention
@@ -171,7 +191,7 @@ public class SNLPPrologAdapter {
 	}
 
 	public static void main(String[] args) {
-		SNLPPrologAdapter n = new SNLPPrologAdapter("Delete information about patient\'s age");
+		SNLPPrologAdapter n = new SNLPPrologAdapter("to shift Identifier Type up one position");
 		String[] lista = n.getBasicDependenceGraph();
 		for (int i = 0; i < lista.length; i++) {
 			System.out.println(lista[i]);
@@ -253,7 +273,6 @@ public class SNLPPrologAdapter {
 //		// Both sentence and token offsets start at 1!
 //		Map<Integer, CorefChain> graph = document.get(CorefChainAnnotation.class);
 
-		System.out.println("teste");
 
 	}
 }
