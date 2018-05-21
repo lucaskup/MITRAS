@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>MITRAS</title>
+		<link rel="stylesheet" type="text/css" href="css/estilo.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="js/eventos.js"></script>
+	</head>
+	<body>
+		<!--Div para área do chat!-->
+		<div class="panel-conversation" id="panel-conversas">
+			<!--Div para linha do chat!-->
+			<div class="chat-line">
+				<div class="text-wrapper text-wrapper-right">
+					<div class="text text-right">First message!</div>
+				</div>
+				<div class="avatar avatar-mitras"></div>
+			</div>
+			
+			<div class="chat-line">
+				<div class="avatar avatar-user"></div>
+				<div class="text-wrapper text-wrapper-left">
+					<div class="text text-left">First message!</div>
+				</div>
+			</div>
+		</div>
+		<!--Div para área de envio de mensagens!-->
+		<div class="panel-send">
+			<div class="input-wrapper">
+				<input class="input-text" type="text" id="input">
+			</div>
+			<div class="send-message" onclick="enviarMensagem()">
+				<div class="text-button">Send</div>
+			</div>
+		</div>
+	</body>
+</html>
