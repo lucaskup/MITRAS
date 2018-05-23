@@ -1,6 +1,9 @@
 tipo = 0
+function getTexto(){
+	return document.getElementById( "input" ).value.trim();
+}
 function enviarMensagem(){
-	texto = document.getElementById( "input" ).value.trim()
+	texto = getTexto();
 	if(texto != ""){
 		if(tipo == 0){
 			addToMessagePanel(0,texto);
@@ -10,9 +13,6 @@ function enviarMensagem(){
 			tipo = 0;
 		}
 	}
-
-	
-	
 }
 function addToMessagePanel(type, message){
 	//alert("TESTEE");
@@ -34,15 +34,12 @@ function addToMessagePanel(type, message){
 	
 	text_wrapper.appendChild(text_line);
 	
-	
 	avatar = document.createElement( "div" );
 	avatar.classList.add("avatar") 
 	
-
-	
 	container_block = document.getElementById( 'panel-conversas' );
 	container_block.appendChild( chat_line );
-	document.getElementById( "input" ).value = "";
+
 	
 	if(type == 0){
 		avatar.classList.add("avatar-mitras");
@@ -55,17 +52,15 @@ function addToMessagePanel(type, message){
 		text_wrapper.classList.add("text-wrapper-left");
 		text_line.classList.add("text-left");
 		chat_line.appendChild(avatar);
-		chat_line.appendChild(text_wrapper);
-		
+		chat_line.appendChild(text_wrapper);	
 	}
-	
-	
 	chat_line.scrollIntoView();
+	enviarRequisicao()
+	document.getElementById( "input" ).value = "";
 }
 
 
 $(document).ready(function() {
-
 	document.getElementById("input")
 		.addEventListener("keyup", function(event) {
 		event.preventDefault();
@@ -75,5 +70,16 @@ $(document).ready(function() {
 	});
 
 });
+
+function enviarRequisicao(){
+	
+$.post( 'http://127.0.0.1:5000/', { mensagem: getTexto() })
+  .done(function( data ) {
+	  console.log(data);
+    //alert( "Data Loaded: " + data );
+  });
+	
+}
+  
 
 
