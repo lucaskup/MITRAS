@@ -87,7 +87,7 @@ adjective(X) :-
 	word(X,jj,_).
 
 is_synonym(add,X) :-
-	memberchk(X, ['add','attach','append','annex','bind','connect','fix','put','create','include']).
+	memberchk(X, ['add','attach','append','annex','bind','connect','fix','put','create','include','insert']).
 
 is_synonym(hide,X) :-
 	memberchk(X, ['hide','delete','cover','exclude','destroy','annul','remove','erase','conceal']).
@@ -109,52 +109,19 @@ is_synonym(field,X) :-
 
 is_synonym(patient,X) :-
 	memberchk(X, ['users','patient','person','visits','encounters','providers','locations']).
+
+is_synonym(patient_names,X) :-
+	memberchk(X,['patientNames']).
+
+is_synonym('patient names',X) :-
+	memberchk(X,['patientNames']).
+
 is_synonym(name_panel,X) :-
 	memberchk(X,['patientNames']).
 
-/*conv(Lang, Output) :-   
-    (Lang = one ->
-        Output = 1;
-    Lang = two ->
-        Output = 2;
-    Lang = three ->
-        Output = 3;
-    Lang = four ->
-        Output = 4;
-    Lang = five ->
-        Output = 5;
-    Lang = six ->
-        Output = 6;
-    Lang = seven ->
-        Output = 7;
-    Lang = eight ->
-        Output = 8;
-    Lang = nine ->
-        Output = 9;
-    Lang = ten ->
-        Output = 10).
+is_synonym('name panel',X) :-
+	memberchk(X,['patientNames']).
 
-conv2(Lang, Output) :-   
-    (Lang = first ->
-        Output = 1;
-    Lang = second ->
-        Output = 2;
-    Lang = third ->
-        Output = 3;
-    Lang = fourth ->
-        Output = 4;
-    Lang = fifth ->
-        Output = 5;
-    Lang = sixth ->
-        Output = 6;
-    Lang = seventhh ->
-        Output = 7;
-    Lang = eight ->
-        Output = 8;
-    Lang = ninth ->
-        Output = 9;
-    Lang = tenth ->
-        Output = 10).*/
 
 
 %Predicado para checar existencia do elemento na ONTOLOGIA e buscar o ID correspondente
@@ -169,11 +136,12 @@ check_id_ontology(Name,Id) :-
 %% Please, add up an identity field in the customer register/Add up age field in the customer form/ May I add Cell Phone Number field in customer form?
 %% Include identity field in the customer register/ Create one more identity field / Create another identify field / Is it possible to add another identity field? 
 %% How can/could I create an extra identity field? / Shall I add another field? 
+
 t1(Id,Complete_What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
-	edge_dependence_basic(Verb,Where,nmod),
+	(edge_dependence_basic(Verb,Where,nmod);edge_dependence_basic(What,Where,nmod)),
 	edge_dependence_basic(Where,Where_Complement,compound),
 	is_synonym('field',What),
 
@@ -191,39 +159,12 @@ t1(Id,Complete_What) :-
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '), writeln(Complete_What),
 	write('Location Name: '),writeln(Complete_Where),
-	check_id_ontology(Complete_Where,Id),!.
-
-%%Frases exemplo: 
-%% VERIFICAR NECESSIDADE PELO FATO DAS MAIUSCULAS.
-%% Please, add a cell phone number field in customer register/I would like to create a cell phone number field on customer form
-t1(Id,Complete_What) :-
-	verb(Verb),
-	is_synonym('add',Verb),
-	edge_dependence_basic(Verb,What,dobj),
-	edge_dependence_basic(What,Where,nmod),
-	edge_dependence_basic(Where,Where_Complement,compound),
-	is_synonym('field',What),
-
-	%%usa a proxima verificacao apenas para comprovar a existencia de um compound relacionado com um substantivo para validar a regra.	
-	edge_dependence_basic(What,_,compound),
-
-
-	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds		
-	findall(X,edge_dependence_basic(What, X, compound),Z),
-	atomic_list_concat(Z, ' ', Complete_What),
-
-	atom_concat(Where_Complement,' ',U_Where_Complement),
-	atom_concat(U_Where_Complement,Where,Complete_Where),
-
-	writeln('2'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '), writeln(Complete_What),
-	write('Location Name: '),writeln(Complete_Where),
-	check_id_ontology(Complete_Where,Id),!.
+	
+	check_where(Complete_Where,Id),!.
 
 %% Praticamente a mesma regra que a anterior, mas como nao temos a palavra field, a verificacao tem que ser diferente
 %%Frase exemplo: 
-%% Please, add a cell phone number in customer register
+%% Please, add cell phone number in customer register
 t1(Id,Complete_What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
@@ -236,7 +177,7 @@ t1(Id,Complete_What) :-
 
 	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds	
 	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
-	atomic_list_concat(List_Compound_What, ' ',Compound_What),	
+	atomic_list_concat(List_Compound_What, '_',Compound_What),	
 
 	atom_concat(Compound_What,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
@@ -244,11 +185,11 @@ t1(Id,Complete_What) :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('3'),
+	writeln('2'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '), writeln(Complete_What),
 	write('Location Name: '),writeln(Complete_Where),
-	check_id_ontology(Complete_Where,Id),!.
+	check_where(Complete_Where,Id),!.
 
 %%Frase exemplo: 
 %% VERIFICAR NECESSIDADE PELO FATO DAS MAIUSCULAS
@@ -264,35 +205,11 @@ t1(Id,What_Complement) :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('4'),
+	writeln('3'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '), writeln(What_Complement),
 	write('Location Name: '),writeln(Complete_Where),
-	check_id_ontology(Complete_Where,Id),!.
-
-
-%% Frase exemplo:
-%% I need a field for secret name in the patient form
-t1(Id,Complete_What) :- 
-	adjective(Adjective),
-	edge_dependence_basic(What,Adjective,amod),
-	edge_dependence_basic(What,Where,nmod),
-	edge_dependence_basic(Where,Where_Complement,compound),
-	%is_synonym('field',What),
-	word(What,nn,_),		
-
-	atom_concat(Where_Complement,'_',U_Where_Complement),
-	atom_concat(U_Where_Complement,Where,Complete_Where),
-
-	atom_concat(Adjective,'_',U_What_Complement),
-	atom_concat(U_What_Complement,What,Complete_What),
-
-	writeln('5'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '),writeln(Complete_What),
-	write('Location Name: '),writeln(Complete_Where),
-	check_id_ontology(Complete_Where,Id),!.
-
+	check_where(Complete_Where,Id),!.
 
 %%Frase exemplo: 
 %%Please, add a new field for secret name in the customer form
@@ -313,11 +230,82 @@ t1(Id,Complete_What) :-
 	atom_concat(What_Complement,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 
-	writeln('6'),
+	writeln('4'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(Complete_What),
 	write('Location Name: '),writeln(Complete_Where),
-	check_id_ontology(Complete_Where,Id),!.
+	check_where(Complete_Where,Id),!.
+
+%%Frase exemplo: 
+%%Put a new information in costumer register
+t1(Id, What) :-
+	verb(Verb),
+	is_synonym('add',Verb),
+	edge_dependence_basic(Verb,Ligacao,dobj),
+
+	%% verifica se o objeto direto possui um adjetivo relacionado, neste caso 'new'
+	edge_dependence_basic(Ligacao,_,amod),
+
+	edge_dependence_basic(Verb,Where,nmod),
+	edge_dependence_basic(Where,Where_Complement,compound),
+	
+	atom_concat(Where_Complement,'_',U_Where_Complement),
+	atom_concat(U_Where_Complement,Where,Complete_Where),
+
+	writeln('5'),
+	writeln('## Transformation 1 ##'),
+	writeln('Field Name: >> NOT INFORMED <<'),
+	write('Location Name: '),writeln(Complete_Where),
+	miss_what(Complete_Where,What),	
+	check_where(Complete_Where,Id),!.
+
+
+%%Frase exemplo: 
+%%Put a new information in costumer register
+t1(Id, What) :-
+	verb(Verb),
+	is_synonym('add',Verb),
+	edge_dependence_basic(Verb,Ligacao,dobj),
+
+	%% verifica se o objeto direto possui um adjetivo relacionado, neste caso 'new'
+	edge_dependence_basic(Ligacao,_,amod),
+
+	edge_dependence_basic(Ligacao,Where,nmod),
+	edge_dependence_basic(Where,Where_Complement,compound),
+	
+	atom_concat(Where_Complement,'_',U_Where_Complement),
+	atom_concat(U_Where_Complement,Where,Complete_Where),
+
+	writeln('6'),
+	writeln('## Transformation 1 ##'),
+	writeln('Field Name: >> NOT INFORMED <<'),
+	write('Location Name: '),writeln(Complete_Where),	
+	check_where(Complete_Where,Id),
+	namePanel(Id,NeWhere),
+	miss_what(NeWhere,What),!.
+
+
+%% Frase exemplo:
+%% I need a field for secret name in the patient form
+t1(Id,Complete_What) :- 
+	adjective(Adjective),
+	edge_dependence_basic(What,Adjective,amod),
+	edge_dependence_basic(What,Where,nmod),
+	edge_dependence_basic(Where,Where_Complement,compound),
+	%is_synonym('field',What),
+	word(What,nn,_),		
+
+	atom_concat(Where_Complement,'_',U_Where_Complement),
+	atom_concat(U_Where_Complement,Where,Complete_Where),
+
+	atom_concat(Adjective,'_',U_What_Complement),
+	atom_concat(U_What_Complement,What,Complete_What),
+
+	writeln('7'),
+	writeln('## Transformation 1 ##'),
+	write('Field Name: '),writeln(Complete_What),
+	write('Location Name: '),writeln(Complete_Where),
+	check_where(Complete_Where,Id),!.
 
 %%Frase exemplo: 
 %% Please, add a phone number field in the person/Add a document field in the patient
@@ -336,27 +324,33 @@ t1(Id,Complete_What) :-
 	findall(X,edge_dependence_basic(What, X, compound),Z),
 	atomic_list_concat(Z, '_', Complete_What),
 	
-	writeln('7'),
+	writeln('8'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '), writeln(Complete_What),
 	write('Location Name: '),writeln(Where),
-	check_id_ontology(Where,Id),!.
+	check_where(Where,Id),!.
 
 %%Frase exemplo: 
 %% Aqui usuario indica nome do local como registro ou algo parecido sem mencionar qual tipo especifico
-%% Please, add a document field in the register/Add a document field in the register
-t1(' ',What_Complement) :-
+%% Please, add a cell phone field in the register/Add a document field in the register
+t1(Id,Complete_What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
-	edge_dependence_basic(What, What_Complement,compound),
+
+	%%usa a proxima verificacao apenas para comprovar a existencia de um compound relacionado com um substantivo para validar a regra.	
+	edge_dependence_basic(What,_,compound),
+
+	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds		
+	findall(X,edge_dependence_basic(What, X, compound),Z),
+	atomic_list_concat(Z, ' ', Complete_What),
 	edge_dependence_basic(Verb,_,nmod),
 	
-	writeln('8'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '), writeln(What_Complement),
-	writeln('Location Name: >> NOT INFORMED <<'),!.
-
+	writeln('9'),
+	%%writeln('## Transformation 1 ##'),
+	
+	miss_where(Complete_What,Id).	
+	
 %%Frase exemplo: 
 %%Please, add age in the customer form
 t1(Id,What) :-
@@ -370,12 +364,13 @@ t1(Id,What) :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('9'),
+	writeln('10'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(What),
 	write('Location Name: '),writeln(Complete_Where),
-	check_id_ontology(Complete_Where,Id),!.
+	check_where(Complete_Where,Id),!.
 
+%%verificar real necessidade
 %%Frase exemplo:
 %%Please, add up Form/Age in the customer form
 t1(Id, What) :-
@@ -389,48 +384,11 @@ t1(Id, What) :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('10'),
+	writeln('11'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(What),
 	write('Location Name: '),writeln(Complete_Where),
-	check_id_ontology(Complete_Where,Id),!.
-
-
-%%Frase exemplo: 
-%%Put a new information in costumer register
-t1(Id, ' ') :-
-	verb(Verb),
-	is_synonym('add',Verb),
-	edge_dependence_basic(Verb,Ligacao,dobj),
-	edge_dependence_basic(Ligacao,Where,nmod),
-	edge_dependence_basic(Where,Where_Complement,compound),
-	
-	atom_concat(Where_Complement,'_',U_Where_Complement),
-	atom_concat(U_Where_Complement,Where,Complete_Where),
-
-	writeln('11'),
-	writeln('## Transformation 1 ##'),
-	writeln('Field Name: >> NOT INFORMED <<'),
-	write('Location Name: '),writeln(Complete_Where),
-	check_id_ontology(Complete_Where,Id),!.
-
-
-%%Frase exemplo: 
-%%Please, add a new field in the customer form
-t1(Id, ' ') :-
-	verb(X),
-	is_synonym('add',X),
-	edge_dependence_basic(X,Where,nmod),
-	edge_dependence_basic(Where,Where_Complement,compound),
-	
-	atom_concat(Where_Complement,'_',U_Where_Complement),
-	atom_concat(U_Where_Complement,Where,Complete_Where),
-
-	writeln('12'),
-	writeln('## Transformation 1 ##'),
-	writeln('Field Name: >> NOT INFORMED <<'),
-	write('Location Name: '),writeln(Complete_Where),
-	check_id_ontology(Complete_Where,Id),!.
+	check_where(Complete_Where,Id),!.
 
 %Frase exemplo:
 %Create a field called Phone Number on the customer register
@@ -457,11 +415,32 @@ t1(Id, Complete_What) :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('13'),
+	writeln('12'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(Complete_What),
 	write('Location Name: '),writeln(Complete_Where),
-	check_id_ontology(Complete_Where,Id),!.
+	check_where(Complete_Where,Id),!.
+
+%Frase exemplo:
+%Create a field called name on the customer register
+t1(Id, What) :-
+	verb(Verb),
+	is_synonym('add',Verb),
+	edge_dependence_basic(Verb,Ligacao,dobj),
+	edge_dependence_basic(Ligacao,Nominal,acl),
+	edge_dependence_basic(Nominal,What,xcomp),
+	edge_dependence_basic(Nominal,Where,nmod),
+	edge_dependence_basic(Where,Where_Complement,compound),
+	
+	atom_concat(Where_Complement,'_',U_Where_Complement),
+	atom_concat(U_Where_Complement,Where,Complete_Where),
+
+	writeln('13'),
+	writeln('## Transformation 1 ##'),
+	write('Field Name: '),writeln(What),
+	write('Location Name: '),writeln(Complete_Where),
+	check_where(Complete_Where,Id),!.
+
 
 %Frase exemplo:
 %Create a field called name on the customer register
@@ -481,32 +460,11 @@ t1(Id, What) :-
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(What),
 	write('Location Name: '),writeln(Complete_Where),
-	check_id_ontology(Complete_Where,Id),!.
-
-
-%Frase exemplo:
-%Create a field called name on the customer register
-t1(Id, What) :-
-	verb(Verb),
-	is_synonym('add',Verb),
-	edge_dependence_basic(Verb,Ligacao,dobj),
-	edge_dependence_basic(Ligacao,Nominal,acl),
-	edge_dependence_basic(Nominal,What,xcomp),
-	edge_dependence_basic(Nominal,Where,nmod),
-	edge_dependence_basic(Where,Where_Complement,compound),
-	
-	atom_concat(Where_Complement,'_',U_Where_Complement),
-	atom_concat(U_Where_Complement,Where,Complete_Where),
-
-	writeln('15'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '),writeln(What),
-	write('Location Name: '),writeln(Complete_Where),
-	check_id_ontology(Complete_Where,Id),!.
+	check_where(Complete_Where,Id),!.
 
 %%Frase exemplo: 
-%%Please, add cell phone number field/Add age field
-t1(' ', Complete_What) :-
+%%Please, add cell phone field/create an age field/add age field
+t1(Id, Complete_What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
@@ -518,14 +476,14 @@ t1(' ', Complete_What) :-
 	findall(X,edge_dependence_basic(What, X, compound),Z),
 	atomic_list_concat(Z, '_', Complete_What),
 
-	writeln('16'),
+	writeln('15'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(Complete_What),
-	writeln('Location Name: >> NOT INFORMED <<'),!.
+	miss_where(Complete_What,Id),!.
 
 %%Frase exemplo: 
 %%Please, add cell phone number
-t1(' ', Complete_What) :-
+t1(Id, Complete_What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
@@ -540,14 +498,14 @@ t1(' ', Complete_What) :-
 	atom_concat(What_Complement,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 
-	writeln('17'),
+	writeln('16'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(Complete_What),
-	writeln('Location Name: >> NOT INFORMED <<'),!.
+	miss_where(Complete_What,Id),!.
 
 %%Frase exemplo: 
 %%I would like to create a field called Identity Card
-t1(' ', Complete_What) :-
+t1(Id, Complete_What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	%is_synonym('field',What),
@@ -565,14 +523,14 @@ t1(' ', Complete_What) :-
 	atom_concat(Compound_What,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 	
-	writeln('18'),
+	writeln('17'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(Complete_What),
-	writeln('Location Name: >> NOT INFORMED <<'),!.
+	miss_where(Complete_What,Id),!.
 
 %%Frase exemplo: 
 %%I would like to create a field called age
-t1(' ', What) :-
+t1(Id, What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	%is_synonym('field',What),
@@ -580,23 +538,62 @@ t1(' ', What) :-
 	edge_dependence_basic(Ligacao,Nominal,acl),
 	edge_dependence_basic(Nominal,What,xcomp),
 
-	writeln('19'),
+	writeln('18'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(What),
-	writeln('Location Name: >> NOT INFORMED <<'),!.
+	miss_where(What,Id),!.
 
 %%Frase exemplo: 
 %%Please, add stauts/Add age
-t1(' ', What) :-
+t1(Id, What) :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
 
-	writeln('20'),
+	writeln('19'),
 	writeln('## Transformation 1 ##'),
 	write('Field Name: '),writeln(What),
-	writeln('Location Name: >> NOT INFORMED <<'),!.
+	miss_where(What,Id),!.
 
+miss_where(What,Id) :-
+
+	write('Ok, I get you want to add '), write(What), write('. But I need to know what\'s the panel you want to add it. '),
+	write('Please, write the panel name you want to add '), write(What), write(' field:'), nl,
+
+       repeat,
+	 nl,
+  	 read(Where),
+         (    check_id_ontology(Where,Id)
+	 -> !
+	 ; write('This panel name doesn\'t match a valid instance. Please enter a valid panel:' ),
+	   fail
+	 ).
+
+check_where(Where,Id) :-
+
+       repeat,
+         (    check_id_ontology(Where,Id)
+	 -> !
+	 ; (write(Where), write(' doesn\'t match a valid instance. Please enter a valid panel:' ),
+	 nl,
+	 read(Newhere),
+	 check_where(Newhere,Id)),
+	    !
+	 ).
+
+miss_what(Where,NeWhat) :-
+
+	write('Ok, I get you want to add a field in '), write(Where), write('. But I need to know what\'s the field you want to add in it. '),
+	write('Please, write the field name you want to add: '), nl,
+
+       repeat,
+	 nl,
+  	 read(NeWhat),
+         (    nonvar(NeWhat)
+	 -> !
+	 ; write('This field is not valid. Please enter a valid field name:' ),
+	   fail
+	 ).
 
 %% Transformcao 2 'ocultar campos'
 
@@ -1399,8 +1396,13 @@ t3 :-
 %% NOVA FORMA DE BUSCA DIRETAMENTE DA ONTOLOGIA
 %% Verifica se o Id pertence a um campo 
 
+%%Busca campo a partir do nome ou id
 idCampo(Nome,Id):-
 	field(Id,Nome).
+
+%%Busca painel a partir do nome ou id
+namePanel(Id,Nome):-
+	panel(Id,Nome).
 
 %%Busca posicao do campo na lista
 
