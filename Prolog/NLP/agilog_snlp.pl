@@ -30,17 +30,17 @@ snlp_assert_pos_tag(N) :-
 	N::getWords([]) => Words, 
 	array::Words=>List,
 	maplist(term_string,ListTerm,List),
-	writeln(ListTerm),
+	%writeln(ListTerm),
 	retractall(word(_,_,_)),
 	maplist(assertz,ListTerm).
 
-snlp_assert_ner_tag(N) :-
-	N::getNers([]) => Nes, 
-	array::Nes=>List,
-	maplist(term_string,ListTerm,List),
-	writeln(ListTerm),
-	retractall(ner(_,_,_)),
-	maplist(assertz,ListTerm).
+%snlp_assert_ner_tag(N) :-
+%	N::getNers([]) => Nes, 
+%	array::Nes=>List,
+%	maplist(term_string,ListTerm,List),
+%	writeln(ListTerm),
+%	retractall(ner(_,_,_)),
+%	maplist(assertz,ListTerm).
 
 %snlp_assert_parse_tree(N) :-
 %	N::getParseTree([]) => ParseTree,
@@ -51,27 +51,27 @@ snlp_assert_ner_tag(N) :-
 snlp_assert_dependence_tree(N) :-
 	N::getDependenceGraph([]) => Edges, 
 	array::Edges=>List,
-	write('Lista de Termos: '),
-	writeln(List),
+	%write('Lista de Termos: '),
+	%writeln(List),
 	maplist(term_string,ListTerm,List),
-	writeln(ListTerm),
+	%writeln(ListTerm),
 	retractall(edge_dependence(_,_,_)),
 	maplist(assertz,ListTerm).
 
 snlp_assert_basic_dependence_tree(N) :-
 	N::getBasicDependenceGraph([]) => Edges, 
 	array::Edges=>List,
-	write('Lista de Termos: '),
-	writeln(List),
+	%write('Lista de Termos: '),
+	%writeln(List),
 	maplist(term_string,ListTerm,List),
-	writeln(ListTerm),
+	%writeln(ListTerm),
 	retractall(edge_dependence_basic(_,_,_)),
 	maplist(assertz,ListTerm).
 
 snlp_parse(Txt) :- 
 	new::'agilog.snlp.SNLPPrologAdapter'([Txt]) => N,
 	snlp_assert_pos_tag(N),
-	snlp_assert_ner_tag(N),
+	%snlp_assert_ner_tag(N),
 	snlp_assert_dependence_tree(N),
 	snlp_assert_basic_dependence_tree(N).
 
@@ -155,10 +155,10 @@ t1(Id,Complete_What) :-
 	atom_concat(Where_Complement,' ',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('1'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '), writeln(Complete_What),
-	write('Location Name: '),writeln(Complete_Where),
+	%writeln('1'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '), writeln(Complete_What),
+	%write('Location Name: '),writeln(Complete_Where),
 	
 	check_where(Complete_Where,Id),!.
 
@@ -185,10 +185,10 @@ t1(Id,Complete_What) :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('2'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '), writeln(Complete_What),
-	write('Location Name: '),writeln(Complete_Where),
+	%writeln('2'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '), writeln(Complete_What),
+	%write('Location Name: '),writeln(Complete_Where),
 	check_where(Complete_Where,Id),!.
 
 %%Frase exemplo: 
@@ -205,10 +205,10 @@ t1(Id,What_Complement) :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('3'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '), writeln(What_Complement),
-	write('Location Name: '),writeln(Complete_Where),
+	%writeln('3'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '), writeln(What_Complement),
+	%write('Location Name: '),writeln(Complete_Where),
 	check_where(Complete_Where,Id),!.
 
 %%Frase exemplo: 
@@ -230,10 +230,10 @@ t1(Id,Complete_What) :-
 	atom_concat(What_Complement,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 
-	writeln('4'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '),writeln(Complete_What),
-	write('Location Name: '),writeln(Complete_Where),
+	%writeln('4'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '),writeln(Complete_What),
+	%write('Location Name: '),writeln(Complete_Where),
 	check_where(Complete_Where,Id),!.
 
 %%Frase exemplo: 
@@ -252,10 +252,10 @@ t1(Id, What) :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('5'),
-	writeln('## Transformation 1 ##'),
-	writeln('Field Name: >> NOT INFORMED <<'),
-	write('Location Name: '),writeln(Complete_Where),
+	%writeln('5'),
+	%writeln('## Transformation 1 ##'),
+	%writeln('Field Name: >> NOT INFORMED <<'),
+	%write('Location Name: '),writeln(Complete_Where),
 	miss_what(Complete_Where,What),	
 	check_where(Complete_Where,Id),!.
 
@@ -276,10 +276,10 @@ t1(Id, What) :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('6'),
-	writeln('## Transformation 1 ##'),
-	writeln('Field Name: >> NOT INFORMED <<'),
-	write('Location Name: '),writeln(Complete_Where),	
+	%writeln('6'),
+	%writeln('## Transformation 1 ##'),
+	%writeln('Field Name: >> NOT INFORMED <<'),
+	%write('Location Name: '),writeln(Complete_Where),	
 	check_where(Complete_Where,Id),
 	namePanel(Id,NeWhere),
 	miss_what(NeWhere,What),!.
@@ -301,10 +301,10 @@ t1(Id,Complete_What) :-
 	atom_concat(Adjective,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 
-	writeln('7'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '),writeln(Complete_What),
-	write('Location Name: '),writeln(Complete_Where),
+	%writeln('7'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '),writeln(Complete_What),
+	%write('Location Name: '),writeln(Complete_Where),
 	check_where(Complete_Where,Id),!.
 
 %%Frase exemplo: 
@@ -324,10 +324,10 @@ t1(Id,Complete_What) :-
 	findall(X,edge_dependence_basic(What, X, compound),Z),
 	atomic_list_concat(Z, '_', Complete_What),
 	
-	writeln('8'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '), writeln(Complete_What),
-	write('Location Name: '),writeln(Where),
+	%writeln('8'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '), writeln(Complete_What),
+	%write('Location Name: '),writeln(Where),
 	check_where(Where,Id),!.
 
 %%Frase exemplo: 
@@ -346,7 +346,7 @@ t1(Id,Complete_What) :-
 	atomic_list_concat(Z, ' ', Complete_What),
 	edge_dependence_basic(Verb,_,nmod),
 	
-	writeln('9'),
+	%writeln('9'),
 	%%writeln('## Transformation 1 ##'),
 	
 	miss_where(Complete_What,Id).	
@@ -364,10 +364,10 @@ t1(Id,What) :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('10'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '),writeln(What),
-	write('Location Name: '),writeln(Complete_Where),
+	%writeln('10'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '),writeln(What),
+	%write('Location Name: '),writeln(Complete_Where),
 	check_where(Complete_Where,Id),!.
 
 %%verificar real necessidade
@@ -384,10 +384,10 @@ t1(Id, What) :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('11'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '),writeln(What),
-	write('Location Name: '),writeln(Complete_Where),
+	%writeln('11'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '),writeln(What),
+	%write('Location Name: '),writeln(Complete_Where),
 	check_where(Complete_Where,Id),!.
 
 %Frase exemplo:
@@ -415,10 +415,10 @@ t1(Id, Complete_What) :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('12'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '),writeln(Complete_What),
-	write('Location Name: '),writeln(Complete_Where),
+	%writeln('12'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '),writeln(Complete_What),
+	%write('Location Name: '),writeln(Complete_Where),
 	check_where(Complete_Where,Id),!.
 
 %Frase exemplo:
@@ -435,10 +435,10 @@ t1(Id, What) :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('13'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '),writeln(What),
-	write('Location Name: '),writeln(Complete_Where),
+	%writeln('13'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '),writeln(What),
+	%write('Location Name: '),writeln(Complete_Where),
 	check_where(Complete_Where,Id),!.
 
 
@@ -456,10 +456,10 @@ t1(Id, What) :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	writeln('14'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '),writeln(What),
-	write('Location Name: '),writeln(Complete_Where),
+	%writeln('14'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '),writeln(What),
+	%write('Location Name: '),writeln(Complete_Where),
 	check_where(Complete_Where,Id),!.
 
 %%Frase exemplo: 
@@ -476,9 +476,9 @@ t1(Id, Complete_What) :-
 	findall(X,edge_dependence_basic(What, X, compound),Z),
 	atomic_list_concat(Z, '_', Complete_What),
 
-	writeln('15'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '),writeln(Complete_What),
+	%writeln('15'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '),writeln(Complete_What),
 	miss_where(Complete_What,Id),!.
 
 %%Frase exemplo: 
@@ -498,9 +498,9 @@ t1(Id, Complete_What) :-
 	atom_concat(What_Complement,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 
-	writeln('16'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '),writeln(Complete_What),
+	%writeln('16'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '),writeln(Complete_What),
 	miss_where(Complete_What,Id),!.
 
 %%Frase exemplo: 
@@ -523,9 +523,9 @@ t1(Id, Complete_What) :-
 	atom_concat(Compound_What,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 	
-	writeln('17'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '),writeln(Complete_What),
+	%writeln('17'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '),writeln(Complete_What),
 	miss_where(Complete_What,Id),!.
 
 %%Frase exemplo: 
@@ -538,9 +538,9 @@ t1(Id, What) :-
 	edge_dependence_basic(Ligacao,Nominal,acl),
 	edge_dependence_basic(Nominal,What,xcomp),
 
-	writeln('18'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '),writeln(What),
+	%writeln('18'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '),writeln(What),
 	miss_where(What,Id),!.
 
 %%Frase exemplo: 
@@ -550,9 +550,9 @@ t1(Id, What) :-
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
 
-	writeln('19'),
-	writeln('## Transformation 1 ##'),
-	write('Field Name: '),writeln(What),
+	%writeln('19'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '),writeln(What),
 	miss_where(What,Id),!.
 
 miss_where(What,Id) :-
