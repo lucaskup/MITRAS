@@ -65,16 +65,30 @@ $(document).ready(function() {
 
 });
 
-function enviarRequisicao(texto){
+window.setInterval(receberResposta, 400);
+
+function receberResposta(){
 	
-$.get( 'http://localhost:8090/mitras', { mensagem: texto })
+$.get( 'http://localhost:8090/mitras')
   .done(function( data ) {
 	  console.log(data);
-	  addToMessagePanel(0,data.message);
+	  if(data.message){
+	  	addToMessagePanel(0,data.message);	
+	  }
     //alert( "Data Loaded: " + data );
   });
 	
 }
   
+function enviarRequisicao(texto){
 
+
+$.post( "http://localhost:8090/mitras", { mensagem: texto },
+	function( data ) {
+	  console.log(data);
+	  //addToMessagePanel(0,data.status);
+    //alert( "Data Loaded: " + data );
+  },"json");
+	
+}
 

@@ -1,3 +1,7 @@
+:-use_module(library(http/json)).
+:-use_module(library(http/json_convert)).
+:-use_module(library(http/http_json)).
+
 % Predicate for starting MITRAS, setups all the agents and starts prolog webserver
 mitras_start :-
 	start_agent(webserver_agent, setup_webs_agent),
@@ -19,6 +23,8 @@ setup_nlp_agent :-
 		parse_frase(Mensagem)).
 
 parse_frase(Frase) :-
+	:>writeln('Comunicacao do Agente wesag'),
+	%assertz(vouparser(Frase)),
 	snlp_parse(Frase),
 	t1(X,Y),
 	++what(X),
@@ -26,6 +32,7 @@ parse_frase(Frase) :-
 	:>writeln('Frase Parseada'),
 	:>writeln(X),
 	:>writeln(Y),
+	responder('Teste assincrono') >> webserver_agent,
 	transform >> transf_agent.
 
 % Code for Transformation Agent
@@ -46,16 +53,53 @@ setup_webs_agent :-
 		websag_handle_htpost(CliAddr,PathList,ParList,Content) ),
 	handle_event(htget(CliAddr,PathList,ParList),
 		websag_handle_htget(CliAddr,PathList,ParList) ),
+	handle_event(responder(Frase) << nlp_agent,
+		registrar_proxima_resposta(Frase)),
 	writeln('Web Server Agent Started').
+registrar_proxima_resposta(Frase) :-
+	++resposta(Frase).
 
-websag_handle_htget(_ClientAddr,[mitras],ParList) :-
+websag_handle_htget(_ClientAddr,[mitras],_ParList) :-
 	!,
- 	:> writeln('recebeu mitras'),
- 	:> writeln(ParList),
- 	memberchk(mensagem=Mensagem,ParList),
+ 	:> writeln('recebeu mitras GET'),
+ 	%:> writeln(ParList),
+ 	%memberchk(mensagem=Mensagem,ParList),
+ 	%:>writeln(Mensagem),
+ 	%receber(Mensagem) >> nlp_agent,
+ 	%snlp_parse(Mensagem),
+ 	%:>writeln('Realizou parse'),
+ 	responder_requisicao,
+ 	:>writeln('Respondeu GET').
+
+ websag_handle_htpost(_ClientAddr,[mitras],ParList, Content) :-
+	!,
+ 	:> writeln('recebeu mitras POST'),
+ 	:> writeln(Content),
+ 	trata_post(Content,Mensagem),
  	:>writeln(Mensagem),
  	receber(Mensagem) >> nlp_agent,
  	%snlp_parse(Mensagem),
  	:>writeln('Realizou parse'),
- 	responder_requisicao,
- 	:>writeln('Respondeu requisicao').
+ 	responder_requisicao_ok,
+ 	:>writeln('Respondeu POST').
+
+ trata_post(Dados,Mensagem) :-
+ 	atom_string(Dados,X),
+ 	split_string(X,"=","",[_|Y]),
+ 	atomic_list_concat(Y,Z),
+ 	atomic_list_concat(A,'+',Z),
+ 	atomic_list_concat(A,' ',Mensagem).
+
+responder_requisicao_ok :-
+	reply_json(json([status="OK"])).
+
+responder_requisicao :-
+	??resposta(X),
+	--resposta(X),
+	responder_requisicao(X).
+
+responder_requisicao :-
+	reply_json(json([status="Empty"])).
+
+responder_requisicao(Mensagem) :-
+	reply_json(json([message=Mensagem])).
