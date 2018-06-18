@@ -34,13 +34,13 @@ snlp_assert_pos_tag(N) :-
 	retractall(word(_,_,_)),
 	maplist(assertz,ListTerm).
 
-%snlp_assert_ner_tag(N) :-
-%	N::getNers([]) => Nes, 
-%	array::Nes=>List,
-%	maplist(term_string,ListTerm,List),
-%	writeln(ListTerm),
-%	retractall(ner(_,_,_)),
-%	maplist(assertz,ListTerm).
+snlp_assert_ner_tag(N) :-
+	N::getNers([]) => Nes, 
+	array::Nes=>List,
+	maplist(term_string,ListTerm,List),
+	%writeln(ListTerm),
+	retractall(ner(_,_,_)),
+	maplist(assertz,ListTerm).
 
 %snlp_assert_parse_tree(N) :-
 %	N::getParseTree([]) => ParseTree,
@@ -71,7 +71,7 @@ snlp_assert_basic_dependence_tree(N) :-
 snlp_parse(Txt) :- 
 	new::'agilog.snlp.SNLPPrologAdapter'([Txt]) => N,
 	snlp_assert_pos_tag(N),
-	%snlp_assert_ner_tag(N),
+	snlp_assert_ner_tag(N),
 	snlp_assert_dependence_tree(N),
 	snlp_assert_basic_dependence_tree(N).
 

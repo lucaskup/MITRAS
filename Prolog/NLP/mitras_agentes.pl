@@ -20,7 +20,8 @@ setup_nlp_agent :-
 	start_console,
 	snlp_parse('I need'),
 	handle_event(receber(Mensagem) << webserver_agent,
-		parse_frase(Mensagem)).
+		parse_frase(Mensagem)),
+	writeln('NLP Agent Started').
 
 parse_frase(Frase) :-
 	:>writeln('Comunicacao do Agente wesag'),
@@ -62,12 +63,6 @@ registrar_proxima_resposta(Frase) :-
 websag_handle_htget(_ClientAddr,[mitras],_ParList) :-
 	!,
  	:> writeln('recebeu mitras GET'),
- 	%:> writeln(ParList),
- 	%memberchk(mensagem=Mensagem,ParList),
- 	%:>writeln(Mensagem),
- 	%receber(Mensagem) >> nlp_agent,
- 	%snlp_parse(Mensagem),
- 	%:>writeln('Realizou parse'),
  	responder_requisicao,
  	:>writeln('Respondeu GET').
 
@@ -78,7 +73,6 @@ websag_handle_htget(_ClientAddr,[mitras],_ParList) :-
  	trata_post(Content,Mensagem),
  	:>writeln(Mensagem),
  	receber(Mensagem) >> nlp_agent,
- 	%snlp_parse(Mensagem),
  	:>writeln('Realizou parse'),
  	responder_requisicao_ok,
  	:>writeln('Respondeu POST').
