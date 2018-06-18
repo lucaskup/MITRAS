@@ -71,7 +71,7 @@ websag_handle_htget(_ClientAddr,[mitras],_ParList) :-
  	responder_requisicao,
  	:>writeln('Respondeu GET').
 
- websag_handle_htpost(_ClientAddr,[mitras],ParList, Content) :-
+ websag_handle_htpost(_ClientAddr,[mitras],_ParList, Content) :-
 	!,
  	:> writeln('recebeu mitras POST'),
  	:> writeln(Content),

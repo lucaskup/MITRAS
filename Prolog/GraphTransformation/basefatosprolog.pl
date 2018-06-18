@@ -1,4 +1,8 @@
 :- dynamic arco/3.
+:- discontiguous nodo/3.
+:- discontiguous arco/3.
+:- discontiguous display/2.
+
 nodo(1,'HL7InQueueProcessorServlet','class').
 nodo(5,'Hl7InArchiveListController','class').
 nodo(9,'Hl7InArchiveMigrationController','class').
