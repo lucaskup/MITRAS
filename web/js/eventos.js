@@ -1,17 +1,11 @@
-tipo = 0
 function getTexto(){
 	return document.getElementById( "input" ).value.trim();
 }
 function enviarMensagem(){
 	texto = getTexto();
-	if(texto != ""){
-		if(tipo == 0){
-			addToMessagePanel(0,texto);
-			tipo = 1;
-		}else{
-			addToMessagePanel(1,texto);
-			tipo = 0;
-		}
+	if(texto != ""){	
+		addToMessagePanel(1,texto);
+		enviarRequisicao(texto);
 	}
 }
 function addToMessagePanel(type, message){
@@ -55,7 +49,7 @@ function addToMessagePanel(type, message){
 		chat_line.appendChild(text_wrapper);	
 	}
 	chat_line.scrollIntoView();
-	enviarRequisicao()
+	
 	document.getElementById( "input" ).value = "";
 }
 
@@ -71,15 +65,30 @@ $(document).ready(function() {
 
 });
 
-function enviarRequisicao(){
+window.setInterval(receberResposta, 400);
+
+function receberResposta(){
 	
-$.post( 'http://127.0.0.1:5000/', { mensagem: getTexto() })
+$.get( 'http://localhost:8090/mitras')
   .done(function( data ) {
 	  console.log(data);
+	  if(data.message){
+	  	addToMessagePanel(0,data.message);	
+	  }
     //alert( "Data Loaded: " + data );
   });
 	
 }
   
+function enviarRequisicao(texto){
 
+
+$.post( "http://localhost:8090/mitras", { mensagem: texto },
+	function( data ) {
+	  console.log(data);
+	  //addToMessagePanel(0,data.status);
+    //alert( "Data Loaded: " + data );
+  },"json");
+	
+}
 
