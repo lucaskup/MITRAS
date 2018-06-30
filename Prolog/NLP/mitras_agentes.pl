@@ -10,9 +10,11 @@ mitras_start :-
 	start_web_server(8090).
 % Predicate for stoping MITRAS, stops all agents and stops prolog webserver
 mitras_stop :-
-	stop_web_server(8090),
+	
 	stop_agent(webserver_agent),
-	stop_agent(nlp_agent).
+	stop_agent(nlp_agent),
+	stop_agent(transf_agent),
+	stop_web_server(8090).
 
 % Code for NLP agent
 setup_nlp_agent :- 
@@ -27,13 +29,13 @@ parse_frase(Frase) :-
 	:>writeln('Comunicacao do Agente wesag'),
 	%assertz(vouparser(Frase)),
 	snlp_parse(Frase),
-	t1(X,Y),
-	++what(X),
-	++where(Y),
 	:>writeln('Frase Parseada'),
-	:>writeln(X),
-	:>writeln(Y),
-	responder('Teste assincrono') >> webserver_agent,
+	avaliar_transformacoes,	
+	??resposta(R),
+	responder(R) >> webserver_agent,
+	--resposta(R),
+	--what(_),
+	--where(_),
 	transform >> transf_agent.
 
 % Code for Transformation Agent
@@ -77,7 +79,11 @@ websag_handle_htget(_ClientAddr,[mitras],_ParList) :-
  	responder_requisicao_ok,
  	:>writeln('Respondeu POST').
 
- trata_post(Dados,Mensagem) :-
+%Os dados chegam na requisição post como um atomo, devem ser convertidos
+%para string, separados no caracter = e devemos substituir a string + por espaço, pois
+% por algum motivo o prolog converte os espaços em branco na requisição para sinais
+% de +
+trata_post(Dados,Mensagem) :-
  	atom_string(Dados,X),
  	split_string(X,"=","",[_|Y]),
  	atomic_list_concat(Y,Z),

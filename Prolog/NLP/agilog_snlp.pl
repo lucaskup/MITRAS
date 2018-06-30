@@ -129,6 +129,16 @@ check_id_ontology(Name,Id) :-
 	is_synonym(Name,Ontology_name),
 	interfaceElement(Id,Ontology_name).
 
+avaliar_transformacoes :-
+	retractall(resposta(_)),
+	retractall(where(_)),
+	retractall(what(_)),
+	t1,
+	resposta(R),
+	++resposta(R),
+	where(Id) -> ++where(Id),
+	what(Complete_What) -> ++what(Complete_What).
+
 %% Transformacao 1 permite 'adicionar campos'
 
 %%Frases exemplo: 
@@ -137,7 +147,7 @@ check_id_ontology(Name,Id) :-
 %% Include identity field in the customer register/ Create one more identity field / Create another identify field / Is it possible to add another identity field? 
 %% How can/could I create an extra identity field? / Shall I add another field? 
 
-t1(Id,Complete_What) :-
+t1 :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
@@ -156,16 +166,16 @@ t1(Id,Complete_What) :-
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
 	%writeln('1'),
-	%writeln('## Transformation 1 ##'),
-	%write('Field Name: '), writeln(Complete_What),
-	%write('Location Name: '),writeln(Complete_Where),
 	
-	check_where(Complete_Where,Id),!.
+	check_where(Complete_Where,Id),
+	assertz(resposta('identificamos a transformacao T1.1')),
+	assertz(what(Complete_What)),
+	assertz(where(Id)),!.
 
 %% Praticamente a mesma regra que a anterior, mas como nao temos a palavra field, a verificacao tem que ser diferente
 %%Frase exemplo: 
 %% Please, add cell phone number in customer register
-t1(Id,Complete_What) :-
+t1 :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
@@ -189,12 +199,15 @@ t1(Id,Complete_What) :-
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '), writeln(Complete_What),
 	%write('Location Name: '),writeln(Complete_Where),
-	check_where(Complete_Where,Id),!.
+	check_where(Complete_Where,Id),
+	assertz(resposta('identificamos a transformacao T1.2')),
+	assertz(what(Complete_What)),
+	assertz(where(Id)),!.
 
 %%Frase exemplo: 
 %% VERIFICAR NECESSIDADE PELO FATO DAS MAIUSCULAS
 %% Please, add identity field in the customer register
-t1(Id,What_Complement) :-
+t1 :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
@@ -209,12 +222,15 @@ t1(Id,What_Complement) :-
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '), writeln(What_Complement),
 	%write('Location Name: '),writeln(Complete_Where),
-	check_where(Complete_Where,Id),!.
+	check_where(Complete_Where,Id),
+	assertz(resposta('identificamos a transformacao T1.3')),
+	assertz(what(What_Complement)),
+	assertz(where(Id)),!.
 
 %%Frase exemplo: 
 %%Please, add a new field for secret name in the customer form
 
-t1(Id,Complete_What) :-
+t1 :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,Where,nmod),
@@ -234,7 +250,10 @@ t1(Id,Complete_What) :-
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(Complete_What),
 	%write('Location Name: '),writeln(Complete_Where),
-	check_where(Complete_Where,Id),!.
+	check_where(Complete_Where,Id),
+	assertz(resposta('identificamos a transformacao T1.4')),
+	assertz(what(Complete_What)),
+	assertz(where(Id)),!.
 
 %%Frase exemplo: 
 %%Put a new information in costumer register
@@ -284,10 +303,9 @@ t1(Id, What) :-
 	namePanel(Id,NeWhere),
 	miss_what(NeWhere,What),!.
 
-
 %% Frase exemplo:
 %% I need a field for secret name in the patient form
-t1(Id,Complete_What) :- 
+t1 :- 
 	adjective(Adjective),
 	edge_dependence_basic(What,Adjective,amod),
 	edge_dependence_basic(What,Where,nmod),
@@ -305,11 +323,14 @@ t1(Id,Complete_What) :-
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(Complete_What),
 	%write('Location Name: '),writeln(Complete_Where),
-	check_where(Complete_Where,Id),!.
+	check_where(Complete_Where,Id),
+	assertz(resposta('identificamos a transformacao T1.7')),
+	assertz(what(Complete_What)),
+	assertz(where(Id)),!.
 
 %%Frase exemplo: 
 %% Please, add a phone number field in the person/Add a document field in the patient
-t1(Id,Complete_What) :-
+t1 :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
@@ -328,7 +349,10 @@ t1(Id,Complete_What) :-
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '), writeln(Complete_What),
 	%write('Location Name: '),writeln(Where),
-	check_where(Where,Id),!.
+	check_where(Where,Id),
+	assertz(resposta('identificamos a transformacao T1.8')),
+	assertz(what(Complete_What)),
+	assertz(where(Id)),!.
 
 %%Frase exemplo: 
 %% Aqui usuario indica nome do local como registro ou algo parecido sem mencionar qual tipo especifico
@@ -368,7 +392,10 @@ t1(Id,What) :-
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(What),
 	%write('Location Name: '),writeln(Complete_Where),
-	check_where(Complete_Where,Id),!.
+	check_where(Complete_Where,Id),
+	assertz(resposta('identificamos a transformacao T1.10')),
+	assertz(what(What)),
+	assertz(where(Id)),!.
 
 %%verificar real necessidade
 %%Frase exemplo:
@@ -388,11 +415,14 @@ t1(Id, What) :-
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(What),
 	%write('Location Name: '),writeln(Complete_Where),
-	check_where(Complete_Where,Id),!.
+	check_where(Complete_Where,Id),
+	assertz(resposta('identificamos a transformacao T1.11')),
+	assertz(what(What)),
+	assertz(where(Id)),!.
 
 %Frase exemplo:
 %Create a field called Phone Number on the customer register
-t1(Id, Complete_What) :-
+t1 :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,Ligacao,dobj),
@@ -419,11 +449,14 @@ t1(Id, Complete_What) :-
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(Complete_What),
 	%write('Location Name: '),writeln(Complete_Where),
-	check_where(Complete_Where,Id),!.
+	check_where(Complete_Where,Id),
+	assertz(resposta('identificamos a transformacao T1.12')),
+	assertz(what(Complete_What)),
+	assertz(where(Id)),!.
 
 %Frase exemplo:
 %Create a field called name on the customer register
-t1(Id, What) :-
+t1 :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,Ligacao,dobj),
@@ -439,7 +472,10 @@ t1(Id, What) :-
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(What),
 	%write('Location Name: '),writeln(Complete_Where),
-	check_where(Complete_Where,Id),!.
+	check_where(Complete_Where,Id),
+	assertz(resposta('identificamos a transformacao T1.13')),
+	assertz(what(What)),
+	assertz(where(Id)),!.
 
 
 %Frase exemplo:
@@ -460,7 +496,10 @@ t1(Id, What) :-
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(What),
 	%write('Location Name: '),writeln(Complete_Where),
-	check_where(Complete_Where,Id),!.
+	check_where(Complete_Where,Id),
+	assertz(resposta('identificamos a transformacao T1.14')),
+	assertz(what(What)),
+	assertz(where(Id)),!.
 
 %%Frase exemplo: 
 %%Please, add cell phone field/create an age field/add age field
