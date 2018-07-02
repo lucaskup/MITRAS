@@ -1,13 +1,15 @@
 :-use_module(library(http/json)).
 :-use_module(library(http/json_convert)).
 :-use_module(library(http/http_json)).
+mitras_server_port(8091).
 
 % Predicate for starting MITRAS, setups all the agents and starts prolog webserver
 mitras_start :-
 	start_agent(webserver_agent, setup_webs_agent),
 	start_agent(nlp_agent, setup_nlp_agent),
 	start_agent(transf_agent, setup_transf_agent),
-	start_web_server(8090).
+	mitras_server_port(Porta),
+	start_web_server(Porta).
 % Predicate for stoping MITRAS, stops all agents and stops prolog webserver
 mitras_stop :-
 	
@@ -24,7 +26,8 @@ mitras_stop :-
 	stop_agent(webserver_agent),
 	stop_agent(nlp_agent),
 	stop_agent(transf_agent),
-	stop_web_server(8090).
+	mitras_server_port(Porta),
+	stop_web_server(Porta).
 
 % Code for NLP agent
 setup_nlp_agent :- 

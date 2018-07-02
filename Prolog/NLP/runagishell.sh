@@ -15,4 +15,4 @@ export CLASSPATH
 
 export _JAVA_SR_SIGNUM=20 
 
-swipl -g '[agishell]'
+swipl -g '[agishell],[agilog_snlp],[basefatosprolog],[regras],[mitras_agentes]'
