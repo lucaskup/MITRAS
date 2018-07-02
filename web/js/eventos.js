@@ -69,7 +69,7 @@ window.setInterval(receberResposta, 400);
 
 function receberResposta(){
 	
-$.get( 'http://localhost:8090/mitras')
+$.get( 'http://localhost:8091/mitras')
   .done(function( data ) {
 	  console.log(data);
 	  if(data.message){
@@ -83,7 +83,7 @@ $.get( 'http://localhost:8090/mitras')
 function enviarRequisicao(texto){
 
 
-$.post( "http://localhost:8090/mitras", { mensagem: texto },
+$.post( "http://localhost:8091/mitras", { mensagem: texto },
 	function( data ) {
 	  console.log(data);
 	  //addToMessagePanel(0,data.status);
