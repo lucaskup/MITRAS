@@ -11,6 +11,16 @@ mitras_start :-
 % Predicate for stoping MITRAS, stops all agents and stops prolog webserver
 mitras_stop :-
 	
+	control_agent(webserver_agent),
+	stop_console,
+	release_agent,
+	control_agent(nlp_agent),
+	stop_console,
+	release_agent,
+	control_agent(transf_agent),
+	stop_console,
+	release_agent,
+
 	stop_agent(webserver_agent),
 	stop_agent(nlp_agent),
 	stop_agent(transf_agent),

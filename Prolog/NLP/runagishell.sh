@@ -13,4 +13,6 @@ CLASSPATH=$PATH_TO_ME/agilogj.jar:$PATH_TO_ME/bnjv33/bnjv33.jar:/usr/share/java/
 
 export CLASSPATH
 
+export _JAVA_SR_SIGNUM=20 
+
 swipl -g '[agishell]'
