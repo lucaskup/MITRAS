@@ -69,11 +69,28 @@
 *    - JCGLUZ: Inclusion of support to OWL2 ontologies
 *    - JCGLUZ: Inclusion of support to Bayesian Decision Networks
 *
-* Version 0.7a (September 2017)
+*     Revision 0.7a (September 2017)
 *  
 *    - JCGLUZ: Minor revision
 *    - JCGLUZ: Correction of errors in the support to OWL2 annotations
 *
+*     Revision 0.7b (November 2017)
+*
+* 	 - JCGLUZ: minor correction in agilog_owl2.pl
+*
+*	  Revision 0.7c (November 2017)
+*
+*    - JCGLUZ: minor corrections in update belief (-+ operator)
+*    - JCGLUZ: automatic execution of BDN reasoner when BDN evidences
+*              where changed was not working, this was corrected in
+*              this revision
+*
+*     Revision 0.7d (MAY 2018)
+*
+*    - JCGLUZ: minor revision, created agishell.pl start program, which
+*              loads entire set of Agilog modules: javalog.pl, agilog.pl, 
+*              agilog_bdn.pl, agilog_owl.pl, agilog_jade.pl
+* 
 */
 
 
@@ -90,6 +107,9 @@
 :- 	use_module(library(http/html_write)).		
 :- 	use_module(library(http/http_parameters)).
 :- 	use_module(library(http/http_client)).
+
+:- use_module(library(http/http_cors)).
+:- set_setting(http:cors, [*]).
 
 :- 	op(900, xfy, <<).
 :- 	op(900, xfy, >>).
@@ -195,14 +215,14 @@
 :- 	http_handler(root(.), web_server_handler, [prefix]).
 
 :- 	writeln('*** Agilog - The Agential Programming Logic ***'),
-	writeln('*** Developed by: J.C. Gluz  - Version: 0.7 ***'),
+	writeln('*** Developed by: J.C. Gluz - Version: 0.7d ***'),
 	writeln('*** Agilog programming environment is ready ***'),
 	writeln('*** Use ahlp command for help               ***' ).
 
 :-	[javalog].
-:-  [agilog_bdn].
-:-  [agilog_owl2].
-:-  [agilog_jade].
+%:-  [agilog_bdn].
+%:-  [agilog_owl2].
+%:-  [agilog_jade].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -524,7 +544,7 @@ start_console :-
 	this_agent(Ag),
 	atom_concat('Console for agent: ',Ag,ConsTit),
 %	writeln('will open console'),
-	open_xterm(ConsTit,InStream,OutStream,ErrStream),
+	open_xterm(ConsTit,InStream,OutStream,ErrStream,[]),
 %	writeln('console opened'),
 	assert(agentConsole(Ag,InStream,OutStream,ErrStream)),
 	write('Console for agent: '),write(Ag),writeln(' started.').
@@ -724,6 +744,10 @@ stop_web_server(Port) :-
 % Call back predicate called by web server thread
 web_server_handler(HttpRequest) :-
 %	write(user_error,' HttpRequest='),write(user_error,HttpRequest),nl(user_error),
+	%writeln('Até aqui foi'),
+	      cors_enable(HttpRequest,
+                  [ methods([get,post,delete])
+                  ]),
 	safe_thread_self(CurrThread),
 	member(method(Method),HttpRequest),
 	member(peer(ClientAddr),HttpRequest),
@@ -755,7 +779,8 @@ dispatch_http_request(post,ClientAddr,PathList,ParamList,Time,CurrThread,HttpReq
 dispatch_http_request(put,ClientAddr,PathList,ParamList,Time,CurrThread,HttpRequest) :-
 	http_read_data(HttpRequest, Content, [to(atom)]),
 	web_event_dispatch(CurrThread,htput(ClientAddr,PathList,ParamList,Content),Time).
-
+dispatch_http_request(options,ClientAddr,PathList,ParamList,Time,CurrThread,_HttpRequest) :-
+	web_event_dispatch(CurrThread,htoptions(ClientAddr, PathList, ParamList),Time).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1145,7 +1170,7 @@ event_dispatch_thread(AgentId) :-
 dispatch_event_to_handlers(msg(RecAgentId,CAct,SndAgentId,Time)) :-
 	!,
 %	gtrace,
-%	write('event: '),writeln(msg(RecAgentId,CAct,SndAgentId,Time)),
+	write('event: '),writeln(msg(RecAgentId,CAct,SndAgentId,Time)),
 	dispatch_msg_to_handlers(RecAgentId,CAct,SndAgentId,Time),
 	upd_receptions(CAct,SndAgentId,Time).
 
@@ -1482,7 +1507,7 @@ alog_help((-+),operator, 'Update a belief from the belief base',
 	safe_thread_send_message(EventDispatchThread,upd_bel(Ag,Bel)).
 
 -+ Bel :-
-	Bel/0.
+	-+ Bel/0.
 	
 silent_upd_bel(DelBel,AddBel) :-
 	!,

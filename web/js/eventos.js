@@ -71,7 +71,7 @@ function receberResposta(){
 	
 $.get( 'http://localhost:8091/mitras')
   .done(function( data ) {
-	  console.log(data);
+	  //console.log(data);
 	  if(data.message){
 	  	addToMessagePanel(0,data.message);	
 	  }
@@ -83,12 +83,34 @@ $.get( 'http://localhost:8091/mitras')
 function enviarRequisicao(texto){
 
 
-$.post( "http://localhost:8091/mitras", { mensagem: texto },
-	function( data ) {
-	  console.log(data);
-	  //addToMessagePanel(0,data.status);
-    //alert( "Data Loaded: " + data );
-  },"json");
+//$.post( "http://localhost:8091/mitras", { mensagem: texto },
+//	function( data ) {
+//	  console.log(data);
+//	  //addToMessagePanel(0,data.status);
+//   //alert( "Data Loaded: " + data );
+//  },"json");
+
+//data.mensagem = texto;
+$.ajax({
+  url: "http://localhost:8091/mitras",
+  type: "POST",
+  dataType: "xml/html/script/json", // expected format for response
+  contentType: "application/json", // send as JSON
+  data: JSON.stringify({ mensagem: texto }),
+
+  complete: function() {
+    //called when complete
+  },
+
+  success: function() {
+    console.log(data);
+ },
+
+  error: function() {
+    //called when there is an error
+  },
+});
+
 	
 }
 

@@ -36,14 +36,17 @@ setup_nlp_agent :-
 	snlp_parse('I need'),
 	handle_event(receber(Mensagem) << webserver_agent,
 		parse_frase(Mensagem)),
-	writeln('NLP Agent Started').
+	writeln('NLP Agent Started'),
+	:>writeln('NLP AGENT READY').
 
 parse_frase(Frase) :-
 	:>writeln('Comunicacao do Agente wesag'),
 	%assertz(vouparser(Frase)),
+	:>writeln(Frase),
 	snlp_parse(Frase),
 	:>writeln('Frase Parseada'),
 	avaliar_transformacoes,	
+	:>writeln('Transformações avaliadas'),
 	??resposta(R),
 	responder(R) >> webserver_agent,
 	--resposta(R),
@@ -56,7 +59,8 @@ setup_transf_agent :-
 	writeln('Starting Web Server Agent'),
 	start_console,
 	handle_event(transform << nlp_agent,
-		try_transform).
+		try_transform),
+	:>writeln('TRANSFORMATION AGENT READY').
 
 try_transform :-
 	:>writeln('todo: fazer as transformações').
@@ -69,17 +73,28 @@ setup_webs_agent :-
 		websag_handle_htpost(CliAddr,PathList,ParList,Content) ),
 	handle_event(htget(CliAddr,PathList,ParList),
 		websag_handle_htget(CliAddr,PathList,ParList) ),
+	handle_event(htoptions(CliAddr,PathList,ParList),
+		websag_handle_htoptions(CliAddr,PathList,ParList) ),
 	handle_event(responder(Frase) << nlp_agent,
 		registrar_proxima_resposta(Frase)),
-	writeln('Web Server Agent Started').
+	writeln('Web Server Agent Started'),
+	:>writeln('WEBSAG AGENT READY').
+	
 registrar_proxima_resposta(Frase) :-
 	++resposta(Frase).
 
 websag_handle_htget(_ClientAddr,[mitras],_ParList) :-
 	!,
- 	:> writeln('recebeu mitras GET'),
- 	responder_requisicao,
- 	:>writeln('Respondeu GET').
+ 	%:> writeln('recebeu mitras GET'),
+ 	responder_requisicao.
+ 	%:>writeln('Respondeu GET').
+
+websag_handle_htoptions(_ClientAddr,[mitras],_ParList) :-
+	!,
+ 	:> writeln('recebeu mitras OPTIONS'),
+      format('~n').
+ 	%:>writeln('Respondeu GET').
+
 
  websag_handle_htpost(_ClientAddr,[mitras],_ParList, Content) :-
 	!,
@@ -92,16 +107,27 @@ websag_handle_htget(_ClientAddr,[mitras],_ParList) :-
  	responder_requisicao_ok,
  	:>writeln('Respondeu POST').
 
+
 %Os dados chegam na requisição post como um atomo, devem ser convertidos
 %para string, separados no caracter = e devemos substituir a string + por espaço, pois
 % por algum motivo o prolog converte os espaços em branco na requisição para sinais
 % de +
 trata_post(Dados,Mensagem) :-
- 	atom_string(Dados,X),
- 	split_string(X,"=","",[_|Y]),
- 	atomic_list_concat(Y,Z),
- 	atomic_list_concat(A,'+',Z),
- 	atomic_list_concat(A,' ',Mensagem).
+	:>writeln('trata_post'),
+	is_json_term(Dados), 
+	atom_json_dict(Dados,Dict,_),
+	%assertz(dicion(Dict)),
+	MensagemS = Dict.mensagem,
+	atom_string(Mensagem, MensagemS),
+	:>writeln(Mensagem),!.
+ 	%atom_string(Dados,X),
+ 	%assertz(req_json(Dados)),
+ 	%:>writeln(X),
+ 	%split_string(X,"=","",[_|Y]),
+ 	%:>writeln(Y),
+ 	%atomic_list_concat(Y,Z),
+ 	%atomic_list_concat(A,'+',Z),
+ 	%atomic_list_concat(A,' ',Mensagem).
 
 responder_requisicao_ok :-
 	reply_json(json([status="OK"])).
