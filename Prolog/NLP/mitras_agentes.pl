@@ -43,6 +43,12 @@ parse_frase(Frase) :-
 	:>writeln('Comunicacao do Agente wesag'),
 	%assertz(vouparser(Frase)),
 	:>writeln(Frase),
+	(log_requests -> 
+		get_time(Time), 
+		stamp_date_time(Time,Date,10800),
+		format_time(atom(FormatedDate),'%Y%m%d%H%M%s',Date),
+		assertz(log_frase(Frase,FormatedDate)) 
+		;true),
 	snlp_parse(Frase),
 	:>writeln('Frase Parseada'),
 	avaliar_transformacoes,	
@@ -99,7 +105,7 @@ websag_handle_htoptions(_ClientAddr,[mitras],_ParList) :-
  websag_handle_htpost(_ClientAddr,[mitras],_ParList, Content) :-
 	!,
  	:> writeln('recebeu mitras POST'),
- 	:> writeln(Content),
+ 	%:> writeln(Content),
  	trata_post(Content,Mensagem),
  	:>writeln(Mensagem),
  	receber(Mensagem) >> nlp_agent,
@@ -118,8 +124,7 @@ trata_post(Dados,Mensagem) :-
 	atom_json_dict(Dados,Dict,_),
 	%assertz(dicion(Dict)),
 	MensagemS = Dict.mensagem,
-	atom_string(Mensagem, MensagemS),
-	:>writeln(Mensagem),!.
+	atom_string(Mensagem, MensagemS).
  	%atom_string(Dados,X),
  	%assertz(req_json(Dados)),
  	%:>writeln(X),

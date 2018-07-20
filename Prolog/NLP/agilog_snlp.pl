@@ -119,7 +119,7 @@ is_synonym(patientNames,X) :-
 	memberchk(X,['patientNames','name_panel','patient_name','patient_names']).
 
 is_synonym(patientIdentifiers,X) :-
-	memberchk(X,['patientIdentifiers','id_panel','ids_panel','identification_panel','identifier_panel','patient_id','patient_ids']).
+	memberchk(X,['patientIdentifiers','id_panel','ids_panel','identification_panel','identifier_panel','patient_id','patient_ids','identity_panel']).
 
 is_synonym(patientInformation,X) :-
 	memberchk(X,['patientInformation','information_panel','info_panel','informations','informations_panel','customer_info', 'patient_info','patient_informations','patient_information']).
@@ -130,6 +130,89 @@ is_synonym(patientAddresses,X) :-
 is_synonym(deletePatient,X) :-
 	memberchk(X,['deletePatient','delete_panel','deletion_panel','delete','exclude_panel','delete_patient']).
 
+is_synonym(preferred,X) :-
+	memberchk(X,['preferred','main','top']).
+
+is_synonym(identifier,X) :-
+	memberchk(X,['identifier','id','code']).
+
+is_synonym(identifier_type,X) :-
+	memberchk(X,['identifier_type','type_identifier']).
+
+is_synonym(location,X) :-
+	memberchk(X,['location','local']).
+
+is_synonym(given,X) :-
+	memberchk(X,['given','given_name','first_name']).
+
+is_synonym(middle,X) :-
+	memberchk(X,['middle','middle_name']).
+
+is_synonym(family_name,X) :-
+	memberchk(X,['family_name','last_name']).
+
+is_synonym(address,X) :-
+	memberchk(X,['address']).
+
+is_synonym(section_homestead,X) :-
+	memberchk(X,['section_homestead']).
+
+is_synonym(estate_NearestCentre,X) :-
+	memberchk(X,['estate_NearestCentre']).
+
+is_synonym(sublocation,X) :-
+	memberchk(X,['sublocation']).
+
+is_synonym(division,X) :-
+	memberchk(X,['division']).
+
+is_synonym(province,X) :-
+	memberchk(X,['province','state']).
+
+is_synonym(latitude,X) :-
+	memberchk(X,['latitude','lat']).
+
+is_synonym(country,X) :-
+	memberchk(X,['country']).
+
+is_synonym(town_village,X) :-
+	memberchk(X,['town_village']).
+
+is_synonym(location,X) :-
+	memberchk(X,['location']).
+
+is_synonym(district,X) :-
+	memberchk(X,['district']).
+
+is_synonym(postalCode,X) :-
+	memberchk(X,['postalCode','postal_code','postal_number','postal']).
+
+is_synonym(longitude,X) :-
+	memberchk(X,['longitude','long']).
+
+is_synonym(gender,X) :-
+	memberchk(X,['gender','sex']).
+is_synonym(birthdate,X) :-
+	memberchk(X,['birthdate','birth','birthday','birth_date']).
+
+is_synonym(estimated,X) :-
+	memberchk(X,['estimated']).
+
+is_synonym(deceased,X) :-
+	memberchk(X,['deceased','dead']).
+is_synonym(deleted,X) :-
+	memberchk(X,['deleted','excluded']).
+
+is_synonym(uuid,X) :-
+	memberchk(X,['uuid','id','identifier']).
+
+is_synonym(created_by,X) :-
+	memberchk(X,['created_by','creation','create']).
+
+is_synonym(reason,X) :-
+	memberchk(X,['reason']).
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%
 %FIM ONTOLOGIA DE SINONIMOS
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -138,6 +221,9 @@ is_synonym(deletePatient,X) :-
 check_id_ontology(Name,Id) :-
 	is_synonym(Ontology_name,Name),
 	interfaceElement(Id,Ontology_name).
+check_field_id_ontology(Name,Id) :-
+	is_synonym(Ontology_name,Name),
+	field(Id,Ontology_name).
 
 avaliar_transformacoes :-
 	retractall(transformation(_,_)),
@@ -145,21 +231,37 @@ avaliar_transformacoes :-
 	retractall(where(_)),
 	retractall(where_name(_)),
 	retractall(what(_)),
+	retractall(what_id(_)),
 	t1,
 	resposta(R),
 	++resposta(R),
 	(where(Id) -> ++where(Id);true),
 	(what(What) -> ++what(What);true),!.
+
 avaliar_transformacoes :-
 	retractall(transformation(_,_)),
 	retractall(resposta(_)),
 	retractall(where(_)),
 	retractall(where_name(_)),
 	retractall(what(_)),
+	retractall(what_id(_)),
 	t2,
 	resposta(R),
 	++resposta(R),
 	(where(Id) -> ++where(Id);true),
+	(what(What) -> ++what(What);true),!.
+
+avaliar_transformacoes :-
+	retractall(transformation(_,_)),
+	retractall(resposta(_)),
+	retractall(where(_)),
+	retractall(where_name(_)),
+	retractall(what(_)),
+	retractall(what_id(_)),
+	t3,
+	resposta(R),
+	++resposta(R),
+	(position(Position) -> ++position(Position);true),
 	(what(What) -> ++what(What);true),!.
 
 avaliar_transformacoes :-
@@ -171,9 +273,16 @@ avaliar_transformacoes :-
 	++resposta('Sorry, we could not identify a transformation matching your necessity. I can add fields to specific panels and move UI elements.'),!.
 
 make_response :- 
+	\+transformation(t3,_),
 	where_name(Where_Name),
 	check_id_ontology(Where_Name,Id),
 	assertz(where(Id)),
+	assert_response,!.
+
+make_response :- 
+	what(What),
+	check_field_id_ontology(What,Id),
+	assertz(what_id(Id)),
 	assert_response,!.
 
 make_response :- 
@@ -182,16 +291,27 @@ make_response :-
 assert_response :-
 	transformation(t1,Rule),
 	atom_concat('t1.',Rule,Transf),
-	what(_),
+	what(What),
 	where(_),
-	atomic_list_concat(['Transformation ',Transf, ' identified.'],Resposta),
+	where_name(Where),
+	atomic_list_concat(['Transformation ',Transf, ' identified. New field: ',What,' is going to be created in the ',Where],Resposta),
 	assertz(resposta(Resposta)),!.
+
 assert_response :-	
 	transformation(t2,Rule),
 	atom_concat('t2.',Rule,Transf),
-	what(_),
+	what(What),
 	where(_),
-	atomic_list_concat(['Transformation ',Transf, ' identified.'],Resposta),
+	where_name(Where),
+	atomic_list_concat(['Transformation ',Transf, ' identified. ',What, ' is going to removed from the ', Where],Resposta),
+	assertz(resposta(Resposta)),!.
+assert_response :-	
+	transformation(t3,Rule),
+	atom_concat('t3.',Rule,Transf),
+	what(What),
+	what_id(_),
+	position(Pos),
+	atomic_list_concat(['Transformation ',Transf, ' identified.',What, ' is going to the ', Pos, 'th position.'],Resposta),
 	assertz(resposta(Resposta)),!.
 
 assert_response :-
@@ -244,6 +364,14 @@ assert_response :-
 	\+ where(_),
 	where_name(Where_Name),
 	atomic_list_concat(['Transformation ',Transf, ' indentified, but the panel ',Where_Name ,' does not exists in the system. Please inform in what panel you want the field ',What, ' to be hidden.'],Resposta),
+	assertz(resposta(Resposta)),!.
+
+assert_response :-
+	transformation(t3,Rule),
+	atom_concat('t3.',Rule,Transf),
+	what(What),
+	\+ position(_),
+	atomic_list_concat(['Transformation ',Transf, ' indentified, but no position was specified. Please inform the position you want field ',What, ' to be placed.'],Resposta),
 	assertz(resposta(Resposta)),!.
 
 %% Transformacao 1 permite 'adicionar campos'
@@ -1084,23 +1212,31 @@ t2 :-
 %% Transformcao 3 'mudar posicao dos campos/paineis'
 
 
-	inf(IndiceT,up,What,Position,Numeral) :-
+inf(IndiceT,up,What,Position,Numeral) :-
 	
 	NewPosition is Position - Numeral,
 
-	writeln(IndiceT),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(What),
-	write('Going To Position: '),writeln(NewPosition).
+	assertz(transformation(t3,IndiceT)),
+	assertz(what(What)),
+	assertz(position(NewPosition)),
+	make_response,!.
+	%writeln(IndiceT),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(What),
+	%write('Going To Position: '),writeln(NewPosition).
 
-	inf(IndiceT,down,What,Position,Numeral) :-
+inf(IndiceT,down,What,Position,Numeral) :-
 	
 	NewPosition is Position + Numeral,
 
-	writeln(IndiceT),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(What),
-	write('Going To Position: '),writeln(NewPosition).
+	assertz(transformation(t3,IndiceT)),
+	assertz(what(What)),
+	assertz(position(NewPosition)),
+	make_response,!.
+	%writeln(IndiceT),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(What),
+	%write('Going To Position: '),writeln(NewPosition).
 	
 %%Frase exemplo:
 %%Please, move Identifier Type up/down one position
@@ -1122,7 +1258,7 @@ t3 :-
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,Inflaction,case),
 	edge_dependence_basic(Nominal,Elipsed,nummod),
-	idCampo(Complete_What,Id),
+	check_field_id_ontology(Complete_What,Id),
 	posicao(Id,Position),
 	ner(Elipsed,Numeral,_),
 	%%conv(Elipsed,Numeral),
@@ -1144,7 +1280,7 @@ t3 :-
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,Inflaction,case),
 	edge_dependence_basic(Nominal,Elipsed,nummod),
-	idCampo(Compound_What,Id),
+	check_field_id_ontology(Compound_What,Id),
 	posicao(Id,Position),
 	ner(Elipsed,Numeral,_),
 	%%conv(Elipsed,Numeral),
@@ -1164,7 +1300,7 @@ t3 :-
  	edge_dependence_basic(Verb,Inflaction,compound:prt),
  	edge_dependence_basic(Verb,Dep,dep),
  	edge_dependence_basic(Dep,Elipsed,nummod),
-	idCampo(Compound_What,Id),
+	check_field_id_ontology(Compound_What,Id),
 	posicao(Id,Position),
 	ner(Elipsed,Numeral,_),	
 	%%conv(Elipsed,Numeral),
@@ -1183,7 +1319,7 @@ t3 :-
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,Inflaction,case),
 	edge_dependence_basic(Nominal,Elipsed,nummod),
-	idCampo(What_Complement,Id),
+	check_field_id_ontology(What_Complement,Id),
 	posicao(Id,Position),
 	ner(Elipsed,Numeral,_),
 	%%conv(Elipsed,Numeral),
@@ -1200,7 +1336,7 @@ t3 :-
  	edge_dependence_basic(Verb,Inflaction,compound:prt),
 	edge_dependence_basic(Verb,Dep,dep),
  	edge_dependence_basic(Dep,Elipsed,nummod),
-	idCampo(What_Complement,Id),
+	check_field_id_ontology(What_Complement,Id),
 	posicao(Id,Position),
 	ner(Elipsed,Numeral,_),
 	%%conv(Elipsed,Numeral),
@@ -1217,7 +1353,7 @@ t3 :-
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,Inflaction,case),
 	edge_dependence_basic(Nominal,Elipsed,nummod),
-	idCampo(What,Id),
+	check_field_id_ontology(What,Id),
 	posicao(Id,Position),
 	%%conv(Elipsed,Numeral),
 	ner(Elipsed,Numeral,_),
@@ -1243,12 +1379,17 @@ t3 :-
 	edge_dependence_basic(Nominal,Numerals,amod),
 	ner(Numerals,Ordinal,_),
 	%%conv2(Numerals,Ordinal),
-	idCampo(Complete_What,_),
-		
-	writeln('7'),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(Complete_What),
-	write('Going To Position: '),writeln(Ordinal),!.
+	check_field_id_ontology(Complete_What,_),
+
+	assertz(transformation(t3,7)),
+	assertz(what(Complete_What)),
+	assertz(position(Ordinal)),
+	make_response,!.
+	
+	%writeln('7'),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(Complete_What),
+	%write('Going To Position: '),writeln(Ordinal),!.
 
 %%Frase exemplo:
 %%Move Identifier Type field to the first/second... position
@@ -1266,12 +1407,17 @@ t3 :-
 	edge_dependence_basic(Nominal,Numerals,amod),
 	ner(Numerals,Ordinal,_),
 	%%conv2(Numerals,Ordinal),
-	idCampo(Compound_What,_),
-		
-	writeln('8'),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(Compound_What),
-	write('Going To Position: '),writeln(Ordinal),!.
+	check_field_id_ontology(Compound_What,_),
+	
+	assertz(transformation(t3,8)),
+	assertz(what(Compound_What)),
+	assertz(position(Ordinal)),
+	make_response,!.
+
+	%writeln('8'),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(Compound_What),
+	%write('Going To Position: '),writeln(Ordinal),!.
 
 %%Frase exemplo:
 %%Move Location field to the first/second... position (Talvez nao precise desta regra pois a anterior a principio faz a funcao corretamente)
@@ -1286,12 +1432,16 @@ t3 :-
 	edge_dependence_basic(Nominal,Numerals,amod),
 	ner(Numerals,Ordinal,_),	
 	%%conv2(Numerals,Ordinal),
-	idCampo(What_Complement,_),
-		
-	writeln('9'),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(What_Complement),
-	write('Going To Position: '),writeln(Ordinal),!.
+	check_field_id_ontology(What_Complement,_),
+
+	assertz(transformation(t3,9)),
+	assertz(what(What_Complement)),
+	assertz(position(Ordinal)),
+	make_response,!.		
+	%writeln('9'),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(What_Complement),
+	%write('Going To Position: '),writeln(Ordinal),!.
 
 %%Frase exemplo:
 %%Move Location to the first/second... position
@@ -1305,12 +1455,16 @@ t3 :-
 	edge_dependence_basic(Nominal,Numerals,amod),
 	ner(Numerals,Ordinal,_),	
 	%%conv2(Numerals,Ordinal),
-	idCampo(What,_),
-		
-	writeln('10'),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(What),
-	write('Going To Position: '),writeln(Ordinal),!.
+	check_field_id_ontology(What,_),
+	
+	assertz(transformation(t3,10)),
+	assertz(what(What)),
+	assertz(position(Ordinal)),
+	make_response,!.
+	%writeln('10'),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(What),
+	%write('Going To Position: '),writeln(Ordinal),!.
 
 %%Frase exemplo:
 %%Get Identifier Type to upper position
@@ -1327,15 +1481,19 @@ t3 :-
 	atom_concat(Compound_What,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 	
-	idCampo(Complete_What,_),
+	check_field_id_ontology(Complete_What,_),
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,Adjective,amod),
 	is_synonym('upper',Adjective),
 	
-	writeln('11'),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(Complete_What),
-	write('Going To Position: '),writeln('1'),!.
+	assertz(transformation(t3,11)),
+	assertz(what(Complete_What)),
+	assertz(position(1)),
+	make_response,!.
+	%writeln('11'),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(Complete_What),
+	%write('Going To Position: '),writeln('1'),!.
 
 
 %%Frase exemplo:
@@ -1350,15 +1508,19 @@ t3 :-
 	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
 	atomic_list_concat(List_Compound_What, '_',Compound_What),
 	
-	idCampo(Compound_What,_),
+	check_field_id_ontology(Compound_What,_),
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,Adjective,amod),
 	is_synonym('upper',Adjective),
 	
-	writeln('12'),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(Compound_What),
-	write('Going To Position: '),writeln('1'),!.
+	assertz(transformation(t3,12)),
+	assertz(what(Compound_What)),
+	assertz(position(1)),
+	make_response,!.
+	%writeln('12'),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(Compound_What),
+	%write('Going To Position: '),writeln('1'),!.
 
 %%Frase exemplo:
 %%Get Identifier to upper position
@@ -1369,15 +1531,20 @@ t3 :-
  	edge_dependence_basic(Verb,What,dobj),
 
 	
-	idCampo(What,_),
+	check_field_id_ontology(What,_),
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,Adjective,amod),
 	is_synonym('upper',Adjective),
 	
-	writeln('13'),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(What),
-	write('Going To Position: '),writeln('1'),!.
+	assertz(transformation(t3,13)),
+	assertz(what(What)),
+	assertz(position(1)),
+	make_response,!.
+
+	%writeln('13'),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(What),
+	%write('Going To Position: '),writeln('1'),!.
 
 %%Frase exemplo:
 %%Get Identifier Type to the last position
@@ -1394,16 +1561,20 @@ t3 :-
 	atom_concat(Compound_What,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 	
-	idCampo(Complete_What,Id),
+	check_field_id_ontology(Complete_What,Id),
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,Adjective,amod),
 	is_synonym('last',Adjective),
 	ultima(Id,UltimaPos),
 	
-	writeln('14'),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(Complete_What),
-	write('Going To Position: '),writeln(UltimaPos),!.
+	assertz(transformation(t3,14)),
+	assertz(what(Complete_What)),
+	assertz(position(UltimaPos)),
+	make_response,!.
+	%writeln('14'),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(Complete_What),
+	%write('Going To Position: '),writeln(UltimaPos),!.
 
 %%Frase exemplo:
 %%Get Identifier Type field to the last position
@@ -1417,16 +1588,20 @@ t3 :-
 	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
 	atomic_list_concat(List_Compound_What, '_',Compound_What),
 	
-	idCampo(Compound_What,Id),
+	check_field_id_ontology(Compound_What,Id),
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,Adjective,amod),
 	is_synonym('last',Adjective),
 	ultima(Id,UltimaPos),
 	
-	writeln('15'),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(Compound_What),
-	write('Going To Position: '),writeln(UltimaPos),!.
+	assertz(transformation(t3,15)),
+	assertz(what(Compound_What)),
+	assertz(position(UltimaPos)),
+	make_response,!.
+	%writeln('15'),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(Compound_What),
+	%write('Going To Position: '),writeln(UltimaPos),!.
 
 %%Frase exemplo:
 %%Get Identifier to last position
@@ -1436,16 +1611,20 @@ t3 :-
 	is_synonym('move',Verb),
  	edge_dependence_basic(Verb,What,dobj),
 
-	idCampo(What,Id),
+	check_field_id_ontology(What,Id),
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,Adjective,amod),
 	is_synonym('last',Adjective),
 	ultima(Id,UltimaPos),
 	
-	writeln('16'),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(What),
-	write('Going To Position: '),writeln(UltimaPos),!.
+	assertz(transformation(t3,16)),
+	assertz(what(What)),
+	assertz(position(UltimaPos)),
+	make_response,!.
+	%writeln('16'),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(What),
+	%write('Going To Position: '),writeln(UltimaPos),!.
 
 %%Frase exemplo:
 %%Get Identifier Type to the top
@@ -1462,15 +1641,19 @@ t3 :-
 	atom_concat(Compound_What,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 	
-	idCampo(Complete_What,_),
+	check_field_id_ontology(Complete_What,_),
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,_,case),
 	is_synonym('upper',Nominal),
 	
-	writeln('17'),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(Complete_What),
-	write('Going To Position: '),writeln('1'),!.
+	assertz(transformation(t3,17)),
+	assertz(what(Complete_What)),
+	assertz(position(1)),
+	make_response,!.
+	%writeln('17'),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(Complete_What),
+	%write('Going To Position: '),writeln('1'),!.
 
 %%Frase exemplo:
 %%Get Identifier Type field to the top
@@ -1484,15 +1667,19 @@ t3 :-
 	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
 	atomic_list_concat(List_Compound_What, '_',Compound_What),
 	
-	idCampo(Compound_What,_),
+	check_field_id_ontology(Compound_What,_),
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,_,case),
 	is_synonym('upper',Nominal),
 	
-	writeln('18'),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(Compound_What),
-	write('Going To Position: '),writeln('1'),!.
+	assertz(transformation(t3,18)),
+	assertz(what(Compound_What)),
+	assertz(position(1)),
+	make_response,!.
+	%writeln('18'),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(Compound_What),
+	%write('Going To Position: '),writeln('1'),!.
 
 %%Frase exemplo:
 %%Get Identifier to the top
@@ -1503,15 +1690,19 @@ t3 :-
  	edge_dependence_basic(Verb,What,dobj),
 
 	
-	idCampo(What,_),
+	check_field_id_ontology(What,_),
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,_,case),
 	is_synonym('upper',Nominal),
 	
-	writeln('19'),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(What),
-	write('Going To Position: '),writeln('1'),!.
+	assertz(transformation(t3,19)),
+	assertz(what(What)),
+	assertz(position(1)),
+	make_response,!.
+	%writeln('19'),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(What),
+	%write('Going To Position: '),writeln('1'),!.
 
 %%Frase exemplo:
 %%Get Identifier Type to the bottom
@@ -1528,16 +1719,20 @@ t3 :-
 	atom_concat(Compound_What,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 	
-	idCampo(Complete_What,Id),
+	check_field_id_ontology(Complete_What,Id),
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,_,case),
 	is_synonym('last',Nominal),
 	ultima(Id,UltimaPos),
 	
-	writeln('20'),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(Complete_What),
-	write('Going To Position: '),writeln(UltimaPos),!.
+	assertz(transformation(t3,20)),
+	assertz(what(Complete_What)),
+	assertz(position(UltimaPos)),
+	make_response,!.
+	%writeln('20'),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(Complete_What),
+	%write('Going To Position: '),writeln(UltimaPos),!.
 
 %%Frase exemplo:
 %%Get Identifier Type field to the bottom
@@ -1551,16 +1746,20 @@ t3 :-
 	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
 	atomic_list_concat(List_Compound_What, '_',Compound_What),
 	
-	idCampo(Compound_What,Id),
+	check_field_id_ontology(Compound_What,Id),
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,_,case),
 	is_synonym('last',Nominal),
 	ultima(Id,UltimaPos),
 	
-	writeln('21'),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(Compound_What),
-	write('Going To Position: '),writeln(UltimaPos),!.
+	assertz(transformation(t3,21)),
+	assertz(what(Compound_What)),
+	assertz(position(UltimaPos)),
+	make_response,!.
+	%writeln('21'),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(Compound_What),
+	%write('Going To Position: '),writeln(UltimaPos),!.
 
 %%Frase exemplo:
 %%Get Identifier to the bottom
@@ -1571,16 +1770,20 @@ t3 :-
  	edge_dependence_basic(Verb,What,dobj),
 
 	
-	idCampo(What,Id),
+	check_field_id_ontology(What,Id),
 	edge_dependence_basic(Verb,Nominal,nmod),
 	edge_dependence_basic(Nominal,_,case),
 	is_synonym('last',Nominal),
 	ultima(Id,UltimaPos),
 	
-	writeln('22'),
-	writeln('## Transformation 3 ##'),
-	write('Field To Move: '),writeln(What),
-	write('Going To Position: '),writeln(UltimaPos),!.
+	assertz(transformation(t3,22)),
+	assertz(what(What)),
+	assertz(position(UltimaPos)),
+	make_response,!.
+	%writeln('22'),
+	%writeln('## Transformation 3 ##'),
+	%write('Field To Move: '),writeln(What),
+	%write('Going To Position: '),writeln(UltimaPos),!.
 
 
 
@@ -1623,8 +1826,8 @@ t3 :-
 %% Verifica se o Id pertence a um campo 
 
 %%Busca campo a partir do nome ou id na ontologia de interface
-idCampo(Nome,Id):-
-	field(Id,Nome).
+%idCampo(Nome,Id):-
+%	field(Id,Nome).
 
 %%Busca posicao do campo na lista
 
