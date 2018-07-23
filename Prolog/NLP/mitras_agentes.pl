@@ -1,3 +1,4 @@
+:- dynamic log_requests/0.
 :-use_module(library(http/json)).
 :-use_module(library(http/json_convert)).
 :-use_module(library(http/http_json)).
