@@ -11885,14 +11885,14 @@ panel(100008,deletePatient).
 
 field(1000000,preferred).
 field(1000001,identifier).
-field(1000002,'identifier type').
+field(1000002,'identifieType').
 field(1000003,location).
 
 
 field(1000004,preferred).
 field(1000005,given).
 field(1000006,middle).
-field(1000007,'family name').
+field(1000007,'familyName').
 
 
 field(1000008,preferred).
@@ -11921,7 +11921,7 @@ field(1000027,uuid).
 %% All patient form "editable" fields
 field(1000028,preferred).
 field(1000029,identifier).
-field(1000030,'identifier type').
+field(1000030,'identifierType').
 field(1000031,location).
 field(1000032,createdBy).
 field(1000033,changedBy).
@@ -11930,8 +11930,8 @@ field(1000034,deleted).
 field(1000035,preferred).
 field(1000036,given).
 field(1000037,middle).
-field(1000038,'family name').
-field(1000039,'created by').
+field(1000038,'familyName').
+field(1000039,'createdBy').
 field(1000040,deleted).
 
 field(1000041,preferred).
@@ -11946,16 +11946,16 @@ field(1000049,country).
 field(1000050,town_village).
 field(1000051,location).
 field(1000052,district).
-field(1000053,'postal code').
+field(1000053,'postalCode').
 field(1000054,longitude).
-field(1000055,'created by').
+field(1000055,'createdBy').
 field(1000056,deleted).
 
 field(1000057,gender).
 field(1000058,birthdate).
 field(1000059,estimated).
 field(1000060,deceased).
-field(1000061,'created by').
+field(1000061,'createdBy').
 field(1000062,deleted).
 field(1000063,uuid).
 
