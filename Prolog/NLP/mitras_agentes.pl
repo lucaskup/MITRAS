@@ -2,7 +2,7 @@
 :-use_module(library(http/json)).
 :-use_module(library(http/json_convert)).
 :-use_module(library(http/http_json)).
-mitras_server_port(8091).
+mitras_server_port(8090).
 
 % Predicate for starting MITRAS, setups all the agents and starts prolog webserver
 mitras_start :-
