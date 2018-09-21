@@ -34,7 +34,7 @@ snlp_assert_pos_tag(N) :-
 	maplist(assertz,ListTerm).
 
 snlp_assert_ner_tag(N) :-
-	N::getNers([]) => Nes, 
+	N::getNers([]) => Nes,
 	array::Nes=>List,
 	maplist(term_string,ListTerm,List),
 	%writeln(ListTerm),
@@ -98,10 +98,14 @@ pronoun(X) :-
 whpronoun(X) :-
 	word(X,wdt,_). 
 
-write_on_file(Texto) :-
-	open('teste.txt',append,Stream),
-	write(Stream,Texto), nl,
-	close(Stream).
+numeral_identificado(Word,Numeral):-
+	ner(Word,Numeral,_),
+	Numeral \== 0.
+
+%write_on_file(Texto) :-
+%	open('teste.txt',append,Stream),
+%	write(Stream,Texto), nl,
+%	close(Stream).
 
 %Predicado para checar existencia do elemento na ONTOLOGIA e buscar o ID correspondente
 check_id_ontology(Name,Id) :-
@@ -109,29 +113,36 @@ check_id_ontology(Name,Id) :-
 	interfaceElement(Id,Ontology_name).
 check_field_id_ontology(Name,Id) :-
 	is_synonym(Ontology_name,Name),
-	interfaceElement(Id,Ontology_name).
+	field(Id,Ontology_name).
+check_panel_id_ontology(Name,Id) :-
+	is_synonym(Ontology_name,Name),
+	panel(Id,Ontology_name).
 
-avaliar_transformacoes :-
+limpa_base_crencas :-
 	retractall(transformation(_,_)),
 	retractall(resposta(_)),
 	retractall(where(_)),
 	retractall(where_name(_)),
 	retractall(what(_)),
 	retractall(what_id(_)),
+	retractall(position(_)),
+	retractall(addVerb(_)),
+	retractall(hideVerb(_)),
+	retractall(moveVerb(_)).
+
+
+avaliar_transformacoes :-
+	limpa_base_crencas,
 	t1,
 	resposta(R),
 	++resposta(R),
 	(where(Id) -> ++where(Id);true),
 	(what(What) -> ++what(What);true),
-	write_on_file(R),!.
+	%write_on_file(R),
+	!.
 
 avaliar_transformacoes :-
-	retractall(transformation(_,_)),
-	retractall(resposta(_)),
-	retractall(where(_)),
-	retractall(where_name(_)),
-	retractall(what(_)),
-	retractall(what_id(_)),
+	limpa_base_crencas,
 	t2,
 	resposta(R),
 	++resposta(R),
@@ -139,12 +150,7 @@ avaliar_transformacoes :-
 	(what(What) -> ++what(What);true),!.
 
 avaliar_transformacoes :-
-	retractall(transformation(_,_)),
-	retractall(resposta(_)),
-	retractall(where(_)),
-	retractall(where_name(_)),
-	retractall(what(_)),
-	retractall(what_id(_)),
+	limpa_base_crencas,
 	t3,
 	resposta(R),
 	++resposta(R),
@@ -152,39 +158,38 @@ avaliar_transformacoes :-
 	(what(What) -> ++what(What);true),!.
 
 avaliar_transformacoes :-
-	retractall(transformation(_,_)),
-	retractall(resposta(_)),
-	retractall(where(_)),
-	retractall(where_name(_)),
-	retractall(what(_)),
-	retractall(what_id(_)),
-	retractall(addVerb(_)),
-	retractall(hideVerb(_)),
-	retractall(moveVerb(_)),
+	limpa_base_crencas,
 	help,
 	resposta(R),
 	++resposta(R),!.
 	
 
 avaliar_transformacoes :-
-	retractall(transformation(_)),
-	retractall(resposta(_)),
-	retractall(where(_)),
-	retractall(where_name(_)),
-	retractall(what(_)),
+	limpa_base_crencas,
 	++resposta('Sorry, we could not identify a transformation matching your necessity. I can add fields to specific panels and move UI elements.'),!.
 
 make_response :- 
-	\+transformation(t3,_),
+	transformation(t1,_),
 	where_name(Where_Name),
 	check_id_ontology(Where_Name,Id),
 	assertz(where(Id)),
 	assert_response,!.
 
 make_response :- 
+	transformation(t2,_),
+	where_name(Where_Name),
+	check_panel_id_ontology(Where_Name,Id),
+	assertz(where(Id)),
 	what(What),
-	check_field_id_ontology(What,Id),
-	assertz(what_id(Id)),
+	check_field_id_ontology(What,Id_What),
+	assertz(what_id(Id_What)),
+	assert_response,!.
+
+make_response :- 
+	transformation(t3,_),
+	what(What),
+	check_field_id_ontology(What,Id_What),
+	assertz(what_id(Id_What)),
 	assert_response,!.
 
 make_response :- 
@@ -203,10 +208,22 @@ assert_response :-
 	transformation(t2,Rule),
 	atom_concat('t2.',Rule,Transf),
 	what(What),
+	what_id(_),
 	where(_),
 	where_name(Where),
 	atomic_list_concat(['Transformation ',Transf, ' identified. ',What, ' is going to removed from the ', Where],Resposta),
 	assertz(resposta(Resposta)),!.
+
+assert_response :-	
+	transformation(t2,Rule),
+	atom_concat('t2.',Rule,Transf),
+	what(What),
+	\+what_id(_),
+	where(_),
+	where_name(Where),
+	atomic_list_concat(['Transformation ',Transf, ' identified. But there is no ',What, ' field in the ', Where],Resposta),
+	assertz(resposta(Resposta)),!.
+
 assert_response :-	
 	transformation(t3,Rule),
 	atom_concat('t3.',Rule,Transf),

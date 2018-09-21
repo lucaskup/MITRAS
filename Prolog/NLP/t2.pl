@@ -180,11 +180,13 @@ t2 :-
 	is_synonym('hide',Verb),
 	edge_dependence_basic(Verb,What,dobj),
 	(edge_dependence_basic(Verb,Where,nmod);edge_dependence_basic(What,Where,nmod)),
-	%%edge_dependence_basic(Where,Where_Complement,compound),
+	%edge_dependence_basic(Where,Where_Complement,compound),
 	
 	is_synonym('panel',Where),
 
 	findall(X,edge_dependence_basic(Where, X, compound),List_Compound_Where),
+	length(List_Compound_Where,CompoundQTD),
+	CompoundQTD > 1,
 	atomic_list_concat(List_Compound_Where, '_',Complete_Where),
 
 	

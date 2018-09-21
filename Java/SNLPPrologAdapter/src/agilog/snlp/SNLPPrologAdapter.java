@@ -50,22 +50,23 @@ public class SNLPPrologAdapter {
 		return this.ners;
 	}
 	public SNLPPrologAdapter(String text) {
+		/*
 		// this is your print stream, store the reference
-		//PrintStream err = System.err;
+		PrintStream err = System.err;
 
 		// now make all writes to the System.err stream silent 
-		//System.setErr(new PrintStream(new OutputStream() {
+		System.setErr(new PrintStream(new OutputStream() {
 			
-	//		@Override
-	//		public void write(int arg0) throws IOException {
+			@Override
+			public void write(int arg0) throws IOException {
 				// TODO Auto-generated method stub
 				
-	//		}
-		//}));
+			}
+		}));
 
-		// YOUR CODE HERE
+		*/
 
-		// set everything bck to its original state afterwards
+		
 		  
 		
 		// creates a StanfordCoreNLP object, with POS tagging, lemmatization, NER,
@@ -127,7 +128,7 @@ public class SNLPPrologAdapter {
 								+ ").";
 				grafoDependencias.add(arco.toLowerCase());
 			}
-			this.dependenceGraph = new String[1];
+			this.dependenceGraph = new String[0];
 			this.dependenceGraph = grafoDependencias.toArray(this.dependenceGraph);
 			
 			
@@ -140,10 +141,10 @@ public class SNLPPrologAdapter {
 								+ ").";
 				grafoDependenciasBasica.add(arco.toLowerCase());
 			}
-			this.dependenceGraph = new String[1];
+			this.dependenceGraph = new String[0];
 			this.dependenceGraph = grafoDependencias.toArray(this.dependenceGraph);
 			
-			this.basicDependenceGraph = new String[1];
+			this.basicDependenceGraph = new String[0];
 			this.basicDependenceGraph = grafoDependenciasBasica.toArray(this.basicDependenceGraph);
 
 		}
@@ -169,11 +170,14 @@ public class SNLPPrologAdapter {
 		for (int i = 0; i < this.words.length; i++) {
 			this.words[i] = this.words[i].replaceAll("'", "");
 		}
+		for (int i = 0; i < this.ners.length; i++) {
+			this.ners[i] = this.ners[i].replaceAll("'", "");
+		}
 		//this.parseTree.replaceAll("'", null);
 	}
 
 	public static void main(String[] args) {
-		SNLPPrologAdapter n = new SNLPPrologAdapter("to shift Identifier Type up one position");
+		SNLPPrologAdapter n = new SNLPPrologAdapter("Delete information about patient's middle in the name panel");
 		String[] lista = n.getBasicDependenceGraph();
 		for (int i = 0; i < lista.length; i++) {
 			//System.out.println(lista[i]);
