@@ -6,8 +6,6 @@
 %% Include identity field in the customer register/ Create one more identity field / Create another identify field / Is it possible to add another identity field? 
 %% How can/could I create an extra identity field? / Shall I add another field? 
 
-
-%%  IMPORTANTE!!! NECESSARIO ADICIONAR VARIAS OUTRAS REGRAS PARA CONTEMPLAR QUANDO O USUARIO DIGITA 'PANEL', OU ACHAR UMA FORMA DE CORTAR ESTA PALAVRA
 t1 :-
 	verb(Verb),
 	is_synonym('add',Verb),
@@ -24,6 +22,8 @@ t1 :-
 	atomic_list_concat(Z,'_', Complete_What),
 
 	findall(X,edge_dependence_basic(Where, X, compound),List_Compound_Where),
+	length(List_Compound_Where,CompoundQTD),
+	CompoundQTD > 1,
 	atomic_list_concat(List_Compound_Where, '_',Complete_Where),
 
 	assertz(transformation(t1,0)),
@@ -96,13 +96,15 @@ t1 :-
 	atom_concat(U_What_Complement,What,Complete_What),
 
 	findall(X,edge_dependence_basic(Where, X, compound),List_Compound_Where),
+	length(List_Compound_Where,CompoundQTD),
+	CompoundQTD > 1,
 	atomic_list_concat(List_Compound_Where, '_',Complete_Where),
 
 	%writeln('2'),
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '), writeln(Complete_What),
 	%write('Location Name: '),writeln(Complete_Where),
-	assertz(transformation(t1,2)),
+	assertz(transformation(t1,1)),
 	assertz(what(Complete_What)),
 	assertz(where_name(Complete_Where)),
 	make_response,!.
@@ -134,7 +136,7 @@ t1 :-
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '), writeln(Complete_What),
 	%write('Location Name: '),writeln(Complete_Where),
-	assertz(transformation(t1,3)),
+	assertz(transformation(t1,2)),
 	assertz(what(Complete_What)),
 	assertz(where_name(Complete_Where)),
 	make_response,!.
@@ -152,19 +154,21 @@ t1 :-
 
 	edge_dependence_basic(Verb,Ligacao,dobj),
 	edge_dependence_basic(Ligacao,What,nmod),
-	edge_dependence_basic(What,What_Complement,amod),
+	(edge_dependence_basic(What,What_Complement,amod);edge_dependence_basic(What,What_Complement,compound)),
 
 	atom_concat(What_Complement,'_',U_What_Complement),
 	atom_concat(U_What_Complement,What,Complete_What),
 
 	findall(X,edge_dependence_basic(Where, X, compound),List_Compound_Where),
+	length(List_Compound_Where,CompoundQTD),
+	CompoundQTD > 1,
 	atomic_list_concat(List_Compound_Where, '_',Complete_Where),
 
 	%writeln('4'),
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(Complete_What),
 	%write('Location Name: '),writeln(Complete_Where),
-	assertz(transformation(t1,4)),
+	assertz(transformation(t1,3)),
 	assertz(what(Complete_What)),
 	assertz(where_name(Complete_Where)),
 	make_response,!.
@@ -180,7 +184,7 @@ t1 :-
 
 	edge_dependence_basic(Verb,Ligacao,dobj),
 	edge_dependence_basic(Ligacao,What,nmod),
-	edge_dependence_basic(What,What_Complement,amod),
+	(edge_dependence_basic(What,What_Complement,amod);edge_dependence_basic(What,What_Complement,compound)),
 	
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
@@ -192,7 +196,7 @@ t1 :-
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(Complete_What),
 	%write('Location Name: '),writeln(Complete_Where),
-	assertz(transformation(t1,5)),
+	assertz(transformation(t1,4)),
 	assertz(what(Complete_What)),
 	assertz(where_name(Complete_Where)),
 	make_response,!.
@@ -215,6 +219,8 @@ t1 :-
 	is_synonym('panel',Where),
 
 	findall(X,edge_dependence_basic(Where, X, compound),List_Compound_Where),
+	length(List_Compound_Where,CompoundQTD),
+	CompoundQTD > 1,
 	atomic_list_concat(List_Compound_Where, '_',Complete_Where),
 	
 
@@ -222,7 +228,7 @@ t1 :-
 	%writeln('## Transformation 1 ##'),
 	%writeln('Field Name: >> NOT INFORMED <<'),
 	%write('Location Name: '),writeln(Complete_Where),
-	assertz(transformation(t1,6)),
+	assertz(transformation(t1,5)),
 	assertz(where_name(Complete_Where)),
 	make_response,!.
 
@@ -246,8 +252,9 @@ t1 :-
 	%writeln('## Transformation 1 ##'),
 	%writeln('Field Name: >> NOT INFORMED <<'),
 	%write('Location Name: '),writeln(Complete_Where),
-	assertz(transformation(t1,7)),
+	assertz(transformation(t1,6)),
 	assertz(where_name(Complete_Where)),
+	%%responder('falta alguma coisa') >> webserver_agent,
 	make_response,!.
 
 %% Frase exemplo:
@@ -263,9 +270,11 @@ t1 :-
 	atom_concat(U_What_Complement,What,Complete_What),
 
 	findall(X,edge_dependence_basic(Where, X, compound),List_Compound_Where),
+	length(List_Compound_Where,CompoundQTD),
+	CompoundQTD > 1,
 	atomic_list_concat(List_Compound_Where, '_',Complete_Where),
 
-	assertz(transformation(t1,8)),
+	assertz(transformation(t1,7)),
 	assertz(what(Complete_What)),
 	assertz(where_name(Complete_Where)),
 	make_response,!.
@@ -274,6 +283,7 @@ t1 :-
 %% Frase exemplo:
 %% I need a field for secret name in the patient form
 t1 :- 
+
 	adjective(Adjective),
 	edge_dependence_basic(What,Adjective,amod),
 	edge_dependence_basic(What,Where,nmod),
@@ -291,7 +301,7 @@ t1 :-
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(Complete_What),
 	%write('Location Name: '),writeln(Complete_Where),
-	assertz(transformation(t1,9)),
+	assertz(transformation(t1,8)),
 	assertz(what(Complete_What)),
 	assertz(where_name(Complete_Where)),
 	make_response,!.
@@ -330,9 +340,11 @@ t1 :-
 	is_synonym('panel',Where),
 
 	findall(X,edge_dependence_basic(Where, X, compound),List_Compound_Where),
+	length(List_Compound_Where,CompoundQTD),
+	CompoundQTD > 1,
 	atomic_list_concat(List_Compound_Where, '_',Complete_Where),
 	
-	assertz(transformation(t1,10)),
+	assertz(transformation(t1,9)),
 	assertz(what(What)),
 	assertz(where_name(Complete_Where)),
 	make_response,!.
@@ -351,7 +363,7 @@ t1 :-
 	findall(X,edge_dependence_basic(Where, X, compound),List_Compound_Where),
 	atomic_list_concat(List_Compound_Where, '_',Complete_Where),
 
-	assertz(transformation(t1,11)),
+	assertz(transformation(t1,10)),
 	assertz(what(What)),
 	assertz(where_name(Complete_Where)),
 	make_response,!.
@@ -369,7 +381,7 @@ t1 :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	assertz(transformation(t1,12)),
+	assertz(transformation(t1,11)),
 	assertz(what(What)),
 	assertz(where_name(Complete_Where)),
 	make_response,!.
@@ -397,9 +409,11 @@ t1 :-
 	atom_concat(U_What_Complement,What,Complete_What),
 
 	findall(X,edge_dependence_basic(Where, X, compound),List_Compound_Where),
+	length(List_Compound_Where,CompoundQTD),
+	CompoundQTD > 1,
 	atomic_list_concat(List_Compound_Where, '_',Complete_Where),
 
-	assertz(transformation(t1,13)),
+	assertz(transformation(t1,12)),
 	assertz(what(Complete_What)),
 	assertz(where_name(Complete_Where)),
 	make_response,!.
@@ -429,7 +443,7 @@ t1 :-
 	atom_concat(Where_Complement,'_',U_Where_Complement),
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
-	assertz(transformation(t1,14)),
+	assertz(transformation(t1,13)),
 	assertz(what(Complete_What)),
 	assertz(where_name(Complete_Where)),
 	make_response,!.
@@ -447,10 +461,12 @@ t1 :-
 	is_synonym('panel',Where),
 	
 	findall(X,edge_dependence_basic(Where, X, compound),List_Compound_Where),
+	length(List_Compound_Where,CompoundQTD),
+	CompoundQTD > 1,
 	atomic_list_concat(List_Compound_Where, '_',Complete_Where),
 
 	
-	assertz(transformation(t1,15)),
+	assertz(transformation(t1,14)),
 	assertz(what(What)),
 	assertz(where_name(Complete_Where)),
 	make_response,!.
@@ -473,10 +489,92 @@ t1 :-
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(What),
 	%write('Location Name: '),writeln(Complete_Where),
-	assertz(transformation(t1,16)),
+	assertz(transformation(t1,15)),
 	assertz(what(What)),
 	assertz(where_name(Complete_Where)),
 	make_response,!.
+
+%Frase exemplo:
+%Add cell phone field in address
+t1 :-
+	verb(Verb),
+	is_synonym('add',Verb),
+	is_synonym('field',What),
+	edge_dependence_basic(Verb,What,dobj),
+	(edge_dependence_basic(Verb,Where,nmod);edge_dependence_basic(What,Where,nmod)),
+
+	%%usa a proxima verificacao apenas para comprovar a existencia de um compound relacionado com um substantivo para validar a regra.	
+	edge_dependence_basic(What,_,compound),
+
+	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds	
+	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
+	atomic_list_concat(List_Compound_What, '_',Complete_What),	
+
+	assertz(transformation(t1,16)),
+	assertz(what(Complete_What)),
+	assertz(where_name(Where)),
+	make_response,!.
+
+%Frase exemplo:
+%Add cell phone in address
+t1 :-
+	verb(Verb),
+	is_synonym('add',Verb),
+	edge_dependence_basic(Verb,What,dobj),
+	(edge_dependence_basic(Verb,Where,nmod);edge_dependence_basic(What,Where,nmod)),
+
+	%%usa a proxima verificacao apenas para comprovar a existencia de um compound relacionado com um substantivo para validar a regra.	
+	edge_dependence_basic(What,_,compound),
+
+	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds	
+	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
+	atomic_list_concat(List_Compound_What, '_',Compound_What),
+
+	atom_concat(Compound_What,'_',U_What_Complement),
+	atom_concat(U_What_Complement,What,Complete_What),	
+
+
+	assertz(transformation(t1,17)),
+	assertz(what(Complete_What)),
+	assertz(where_name(Where)),
+	make_response,!.
+
+%Frase exemplo:
+%Add cell phone in address
+t1 :-
+	verb(Verb),
+	is_synonym('add',Verb),
+	edge_dependence_basic(Verb,What,dobj),
+	(edge_dependence_basic(Verb,Where,nmod);edge_dependence_basic(What,Where,nmod)),
+
+	%%usa a proxima verificacao apenas para comprovar a existencia de um compound relacionado com um substantivo para validar a regra.	
+	edge_dependence_basic(What,_,compound),
+
+	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds	
+	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
+	atomic_list_concat(List_Compound_What, '_',Compound_What),	
+
+	atom_concat(Compound_What,'_',U_What_Complement),
+	atom_concat(U_What_Complement,What,Complete_What),
+
+	assertz(transformation(t1,18)),
+	assertz(what(Complete_What)),
+	assertz(where_name(Where)),
+	make_response,!.
+
+%Frase exemplo:
+%Add cell in address
+t1 :-
+	verb(Verb),
+	is_synonym('add',Verb),
+	edge_dependence_basic(Verb,What,dobj),
+	(edge_dependence_basic(Verb,Where,nmod);edge_dependence_basic(What,Where,nmod)),
+
+	assertz(transformation(t1,19)),
+	assertz(what(What)),
+	assertz(where_name(Where)),
+	make_response,!.
+
 
 %%Frase exemplo: 
 %%Please, add cell phone field/create an age field/add age field
@@ -501,7 +599,7 @@ t1 :-
 	%writeln('15'),
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(Complete_What),
-	assertz(transformation(t1,17)),
+	assertz(transformation(t1,20)),
 	assertz(what(Complete_What)),
 	
 	make_response,!.
@@ -523,7 +621,7 @@ t1 :-
 	%writeln('15'),
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(Complete_What),
-	assertz(transformation(t1,18)),
+	assertz(transformation(t1,21)),
 	assertz(what(Complete_What)),
 	
 	make_response,!.
@@ -549,7 +647,7 @@ t1 :-
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(Complete_What),
 
-	assertz(transformation(t1,19)),
+	assertz(transformation(t1,22)),
 	assertz(what(Complete_What)),
 	make_response,!.
 
@@ -594,7 +692,7 @@ t1 :-
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(What),
 
-	assertz(transformation(t1,21)),
+	assertz(transformation(t1,23)),
 	assertz(what(What)),
 	make_response,!.
 
@@ -614,7 +712,7 @@ t1 :-
 	%writeln('19'),
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(What),
-	assertz(transformation(t1,22)),
+	assertz(transformation(t1,24)),
 	assertz(what(What)),
 	assertz(where_name(Complete_Where)),
 	make_response,!.
@@ -630,7 +728,7 @@ t1 :-
 	\+is_synonym('field',What),
 	\+whpronoun(What),
 
-	assertz(transformation(t1,23)),
+	assertz(transformation(t1,25)),
 	assertz(what(What)),
 	make_response,!.
 

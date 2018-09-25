@@ -74,10 +74,10 @@ is_synonym(address,X) :-
 	memberchk(X,['address']).
 
 is_synonym(sectionHomestead,X) :-
-	memberchk(X,['sectionHomestead','section_homestead']).
+	memberchk(X,['sectionHomestead','section_homestead','section']).
 
 is_synonym(estateNearestCentre,X) :-
-	memberchk(X,['estateNearestCentre','estate_NearestCentre']).
+	memberchk(X,['estateNearestCentre','estate_NearestCentre','estate']).
 
 is_synonym(sublocation,X) :-
 	memberchk(X,['sublocation']).
@@ -95,7 +95,7 @@ is_synonym(country,X) :-
 	memberchk(X,['country']).
 
 is_synonym(town_village,X) :-
-	memberchk(X,['town_village']).
+	memberchk(X,['town_village','town/village','town']).
 
 is_synonym(location,X) :-
 	memberchk(X,['location']).

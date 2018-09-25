@@ -133,6 +133,8 @@ limpa_base_crencas :-
 
 avaliar_transformacoes :-
 	limpa_base_crencas,
+	verb(Verb),
+	\+is_synonym('hide',Verb),
 	t1,
 	resposta(R),
 	++resposta(R),
@@ -177,12 +179,12 @@ make_response :-
 
 make_response :- 
 	transformation(t2,_),
-	where_name(Where_Name),
-	check_panel_id_ontology(Where_Name,Id),
-	assertz(where(Id)),
 	what(What),
 	check_field_id_ontology(What,Id_What),
 	assertz(what_id(Id_What)),
+	where_name(Where_Name),
+	check_panel_id_ontology(Where_Name,Id),
+	assertz(where(Id)),
 	assert_response,!.
 
 make_response :- 
@@ -237,6 +239,7 @@ assert_response :-
 	transformation(t1,Rule),
 	atom_concat('t1.',Rule,Transf),
 	\+what(_),
+	check_panel_id_ontology(Where,_),
 	where_name(Where),	
 	atomic_list_concat(['Transformation ',Transf, ' indentified, please inform what field do you want to create in the ',Where],Resposta),
 	assertz(resposta(Resposta)),!.
@@ -266,6 +269,17 @@ assert_response :-
 	where_name(Where),	
 	atomic_list_concat(['Transformation ',Transf, ' indentified, please inform what do you want to hide in the ',Where],Resposta),
 	assertz(resposta(Resposta)),!.
+
+assert_response :-
+	transformation(t2,Rule),
+	atom_concat('t2.',Rule,Transf),
+	what(What),
+	\+ where(_),
+	\+ where_name(_),
+	\+what_id(_),
+	atomic_list_concat(['Transformation ',Transf, ' indentified, But there is no ',What, ' field. Please inform a valid field and its location panel.'],Resposta),
+	assertz(resposta(Resposta)),!.
+
 
 assert_response :-
 	transformation(t2,Rule),
