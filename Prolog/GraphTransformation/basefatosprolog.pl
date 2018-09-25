@@ -11681,14 +11681,14 @@ nodo(1000007,family_name,'field').
 
 nodo(1000008,preferred,'field').
 nodo(1000009,address,'field').
-nodo(1000010,section_homestead,'field').
-nodo(1000011,estate_NearestCentre,'field').
+nodo(1000010,sectionHomestead,'field').
+nodo(1000011,estateNearestCentre,'field').
 nodo(1000012,sublocation,'field').
 nodo(1000013,division,'field').
 nodo(1000014,province,'field').
 nodo(1000015,latitude,'field').
 nodo(1000016,country,'field').
-nodo(1000017,town_village,'field').
+nodo(1000017,townVillage,'field').
 nodo(1000018,location,'field').
 nodo(1000019,district,'field').
 nodo(1000020,postalCode,'field').
@@ -11897,14 +11897,14 @@ field(1000007,'familyName').
 
 field(1000008,preferred).
 field(1000009,address).
-field(1000010,section_homestead).
-field(1000011,estate_NearestCentre).
+field(1000010,sectionHomestead).
+field(1000011,estateNearestCentre).
 field(1000012,sublocation).
 field(1000013,division).
 field(1000014,province).
 field(1000015,latitude).
 field(1000016,country).
-field(1000017,town_village).
+field(1000017,townVillage).
 field(1000018,location).
 field(1000019,district).
 field(1000020,postalCode).
