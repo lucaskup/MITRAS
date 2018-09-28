@@ -362,6 +362,8 @@ t1 :-
 	
 	findall(X,edge_dependence_basic(Where, X, compound),List_Compound_Where),
 	atomic_list_concat(List_Compound_Where, '_',Complete_Where),
+	length(List_Compound_Where,CompoundQTD),
+	CompoundQTD > 1,
 
 	assertz(transformation(t1,10)),
 	assertz(what(What)),
