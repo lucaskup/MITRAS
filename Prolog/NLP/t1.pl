@@ -562,20 +562,6 @@ t1 :-
 	assertz(where_name(Where)),
 	make_response,!.
 
-%Frase exemplo:
-%Add cell in address
-t1 :-
-	verb(Verb),
-	is_synonym('add',Verb),
-	edge_dependence_basic(Verb,What,dobj),
-	(edge_dependence_basic(Verb,Where,nmod);edge_dependence_basic(What,Where,nmod)),
-
-	assertz(transformation(t1,19)),
-	assertz(what(What)),
-	assertz(where_name(Where)),
-	make_response,!.
-
-
 %%Frase exemplo: 
 %%Please, add cell phone field/create an age field/add age field
 t1 :-
@@ -590,6 +576,8 @@ t1 :-
 	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds		
 	findall(X,edge_dependence_basic(What_next, X, compound),Z),
 	
+	length(Z,CompoundQTD),
+	CompoundQTD > 1,
 	%%foi necessaria a verificacao para conseguir fazer um or com a regra seguinte	
 	atomic_list_concat(Z, '_', Compound_What),
 
@@ -599,7 +587,7 @@ t1 :-
 	%writeln('15'),
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(Complete_What),
-	assertz(transformation(t1,20)),
+	assertz(transformation(t1,19)),
 	assertz(what(Complete_What)),
 	
 	make_response,!.
@@ -616,14 +604,35 @@ t1 :-
 
 	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds		
 	findall(X,edge_dependence_basic(What, X, compound),Z),
+	length(Z,CompoundQTD),
+	CompoundQTD > 1,
 	atomic_list_concat(Z, '_', Complete_What),
 
 	%writeln('15'),
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(Complete_What),
-	assertz(transformation(t1,21)),
+	assertz(transformation(t1,20)),
 	assertz(what(Complete_What)),
 	
+	make_response,!.
+
+t1 :-
+	verb(Verb),
+	is_synonym('add',Verb),
+	edge_dependence_basic(Verb,What,dobj),
+
+	edge_dependence_basic(Verb,Where,nmod),
+	edge_dependence_basic(Where,Where_Complement,compound),
+
+	atom_concat(Where_Complement,'_',U_Where_Complement),
+	atom_concat(U_Where_Complement,Where,Complete_Where),
+
+	%writeln('19'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '),writeln(What),
+	assertz(transformation(t1,21)),
+	assertz(what(What)),
+	assertz(where_name(Complete_Where)),
 	make_response,!.
 	
 %%Frase exemplo: 
@@ -674,7 +683,7 @@ t1 :-
 	%writeln('17'),
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(Complete_What),
-	assertz(transformation(t1,20)),
+	assertz(transformation(t1,23)),
 	assertz(what(Complete_What)),
 	make_response,!.
 
@@ -692,29 +701,22 @@ t1 :-
 	%writeln('## Transformation 1 ##'),
 	%write('Field Name: '),writeln(What),
 
-	assertz(transformation(t1,23)),
+	assertz(transformation(t1,24)),
 	assertz(what(What)),
 	make_response,!.
 
-%%Frase exemplo: 
-%%Please, add stauts/Add age
+
+%Frase exemplo:
+%Add cell in address
 t1 :-
 	verb(Verb),
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
+	(edge_dependence_basic(Verb,Where,nmod);edge_dependence_basic(What,Where,nmod)),
 
-	edge_dependence_basic(Verb,Where,nmod),
-	edge_dependence_basic(Where,Where_Complement,compound),
-
-	atom_concat(Where_Complement,'_',U_Where_Complement),
-	atom_concat(U_Where_Complement,Where,Complete_Where),
-
-	%writeln('19'),
-	%writeln('## Transformation 1 ##'),
-	%write('Field Name: '),writeln(What),
-	assertz(transformation(t1,24)),
+	assertz(transformation(t1,25)),
 	assertz(what(What)),
-	assertz(where_name(Complete_Where)),
+	assertz(where_name(Where)),
 	make_response,!.
 	
 %%Frase exemplo: 
@@ -728,7 +730,7 @@ t1 :-
 	\+is_synonym('field',What),
 	\+whpronoun(What),
 
-	assertz(transformation(t1,25)),
+	assertz(transformation(t1,26)),
 	assertz(what(What)),
 	make_response,!.
 
