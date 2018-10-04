@@ -2,7 +2,8 @@
 :-use_module(library(http/json)).
 :-use_module(library(http/json_convert)).
 :-use_module(library(http/http_json)).
-mitras_server_port(8090).
+
+mitras_server_port(8091).
 
 % Predicate for starting MITRAS, setups all the agents and starts prolog webserver
 mitras_start :-
@@ -10,7 +11,9 @@ mitras_start :-
 	start_agent(nlp_agent, setup_nlp_agent),
 	start_agent(transf_agent, setup_transf_agent),
 	mitras_server_port(Porta),
-	start_web_server(Porta).
+	start_web_server(Porta),
+	teste_t1,
+	assertz(log_requests).
 % Predicate for stoping MITRAS, stops all agents and stops prolog webserver
 mitras_stop :-
 	
@@ -28,7 +31,26 @@ mitras_stop :-
 	stop_agent(nlp_agent),
 	stop_agent(transf_agent),
 	mitras_server_port(Porta),
-	stop_web_server(Porta).
+	stop_web_server(Porta),
+	((log_requests,current_predicate(log_frase/2),log_frase(_,_)) -> 
+		get_time(Time), 
+		stamp_date_time(Time,Date,10800),
+		format_time(atom(FormatedDate),'%Y%m%d%H%M%s',Date),
+		atom_concat(FormatedDate,'log.txt',FileName),
+		geraLog(FileName)
+		;true).
+
+writeLogFile(Frase,TimeStamp,Stream) :-
+    atom_concat(TimeStamp,' ',X),
+    atom_concat(X,Frase,Linha),
+    write(Stream,Linha),
+    nl(Stream).
+
+geraLog(File) :-
+    open(File,write,Stream),
+    forall(log_frase(Frase,TimeStamp),writeLogFile(Frase,TimeStamp,Stream)),
+    close(Stream).
+
 
 % Code for NLP agent
 setup_nlp_agent :- 

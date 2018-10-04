@@ -736,3 +736,17 @@ t1 :-
 	assertz(what(What)),
 	make_response,!.
 
+teste_unitario_t1(Frase, What, Where) :-
+	snlp_parse(Frase),
+		((t1,
+		what(What),
+		where_name(Where))-> true;
+								 throw(error(Frase,
+								 	context(t1/1,'Erro, frase não identificada')))).
+
+
+teste_t1 :-
+	teste_unitario_t1('create name field in the name panel', name,name_panel),
+	teste_unitario_t1('create nickname in the identifier panel',nickname,identifier_panel).
+
+
