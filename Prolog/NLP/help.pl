@@ -6,7 +6,7 @@
 %%obs: se o nlp receber apenas uma palavra, ocorre um erro e o programa nao replica uma resposta para o usuario, a nao ser que seja inserido um ponto apos a palavra.
 help :-
 
-	word('help',nn,_),
+	(word('help',nn,_);word('help',vb,_)),
 	assertz(transformation(help,1)),
 	make_response,!.
 
@@ -37,7 +37,7 @@ help :-
 	is_synonym('do',Verb),
 	edge_dependence_basic(Verb,What,dobj),
 	whpronoun(What),
-	assertz(transformation(help,3)),
+	assertz(transformation(help,4)),
 	make_response,!.
 
 %%What can I add?/Create
@@ -47,7 +47,7 @@ help :-
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
 	whpronoun(What),
-	assertz(transformation(help,4)),
+	assertz(transformation(help,5)),
 	assertz(addVerb(_)),
 	make_response,!.
 	
@@ -60,7 +60,7 @@ help :-
 	edge_dependence_basic(Verb,_,aux),
 	is_synonym('field',What),
 	
-	assertz(transformation(help,5)),
+	assertz(transformation(help,6)),
 	assertz(addVerb(_)),
 	make_response,!.	
 
@@ -71,7 +71,7 @@ help :-
 	is_synonym('hide',Verb),
 	edge_dependence_basic(Verb,What,dobj),
 	whpronoun(What),
-	assertz(transformation(help,6)),
+	assertz(transformation(help,7)),
 	assertz(hideVerb(_)),
 	make_response,!.
 	
@@ -84,7 +84,7 @@ help :-
 	edge_dependence_basic(Verb,_,aux),
 	is_synonym('field',What),
 	
-	assertz(transformation(help,7)),
+	assertz(transformation(help,8)),
 	assertz(hideVerb(_)),
 	make_response,!.	
 
@@ -95,7 +95,7 @@ help :-
 	is_synonym('move',Verb),
 	edge_dependence_basic(Verb,What,dobj),
 	whpronoun(What),
-	assertz(transformation(help,8)),
+	assertz(transformation(help,9)),
 	assertz(moveVerb(_)),
 	make_response,!.
 	
@@ -108,22 +108,23 @@ help :-
 	edge_dependence_basic(Verb,_,aux),
 	is_synonym('field',What),
 	
-	assertz(transformation(help,9)),
+	assertz(transformation(help,10)),
 	assertz(moveVerb(_)),
 	make_response,!.	
 
 %%Frase exemplo: 
 %%Please, create a field
 
-help :-
-	verb(Verb),
-	is_synonym('add',Verb),
-	edge_dependence_basic(Verb,What,dobj),
-	\+edge_dependence_basic(What,_,compound),
+%help :-
+%	verb(Verb),
+%	is_synonym('add',Verb),
+%	edge_dependence_basic(Verb,What,dobj),
+%	\+edge_dependence_basic(What,_,acl),
+	
 
-	assertz(transformation(help,10)),
-	assertz(addVerb(_)),
-	make_response,!.
+%	assertz(transformation(help,10)),
+%	assertz(addVerb(_)),
+%	make_response,!.
 
 
 
