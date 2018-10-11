@@ -2,8 +2,7 @@
 :-use_module(library(http/json)).
 :-use_module(library(http/json_convert)).
 :-use_module(library(http/http_json)).
-
-mitras_server_port(8091).
+mitras_server_port(8090).
 
 % Predicate for starting MITRAS, setups all the agents and starts prolog webserver
 mitras_start :-
@@ -32,25 +31,23 @@ mitras_stop :-
 	stop_agent(transf_agent),
 	mitras_server_port(Porta),
 	stop_web_server(Porta),
-	((log_requests,current_predicate(log_frase/2),log_frase(_,_)) -> 
+
+((log_requests,current_predicate(log_frase/2),log_frase(_,_)) -> 
 		get_time(Time), 
 		stamp_date_time(Time,Date,10800),
 		format_time(atom(FormatedDate),'%Y%m%d%H%M%s',Date),
 		atom_concat(FormatedDate,'log.txt',FileName),
 		geraLog(FileName)
 		;true).
-
-writeLogFile(Frase,TimeStamp,Stream) :-
+ writeLogFile(Frase,TimeStamp,Stream) :-
     atom_concat(TimeStamp,' ',X),
     atom_concat(X,Frase,Linha),
     write(Stream,Linha),
     nl(Stream).
-
-geraLog(File) :-
+ geraLog(File) :-
     open(File,write,Stream),
     forall(log_frase(Frase,TimeStamp),writeLogFile(Frase,TimeStamp,Stream)),
     close(Stream).
-
 
 % Code for NLP agent
 setup_nlp_agent :- 
@@ -70,7 +67,7 @@ parse_frase(Frase) :-
 		get_time(Time), 
 		stamp_date_time(Time,Date,10800),
 		format_time(atom(FormatedDate),'%Y%m%d%H%M%s',Date),
-		assertz(log_frase(Frase,FormatedDate)) 
+		assertz(log_frase(Frase,FormatedDate	)) 
 		;true),
 	snlp_parse(Frase),
 	:>writeln('Frase Parseada'),
