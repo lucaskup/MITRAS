@@ -32,41 +32,25 @@ mitras_stop :-
 	stop_agent(transf_agent),
 	mitras_server_port(Porta),
 	stop_web_server(Porta),
-<<<<<<< HEAD
-
-((log_requests,current_predicate(log_frase/2),log_frase(_,_)) -> 
-=======
 	((log_requests,current_predicate(log_frase/2),log_frase(_,_)) -> 
->>>>>>> 350dfc128c2dc85ad2a43fdd61d2d9979497386f
 		get_time(Time), 
 		stamp_date_time(Time,Date,10800),
 		format_time(atom(FormatedDate),'%Y%m%d%H%M%s',Date),
 		atom_concat(FormatedDate,'log.txt',FileName),
 		geraLog(FileName)
 		;true).
-<<<<<<< HEAD
- writeLogFile(Frase,TimeStamp,Stream) :-
-=======
 
 writeLogFile(Frase,TimeStamp,Stream) :-
->>>>>>> 350dfc128c2dc85ad2a43fdd61d2d9979497386f
     atom_concat(TimeStamp,' ',X),
     atom_concat(X,Frase,Linha),
     write(Stream,Linha),
     nl(Stream).
-<<<<<<< HEAD
- geraLog(File) :-
-    open(File,write,Stream),
-    forall(log_frase(Frase,TimeStamp),writeLogFile(Frase,TimeStamp,Stream)),
-    close(Stream).
-=======
 
 geraLog(File) :-
     open(File,write,Stream),
     forall(log_frase(Frase,TimeStamp),writeLogFile(Frase,TimeStamp,Stream)),
     close(Stream).
 
->>>>>>> 350dfc128c2dc85ad2a43fdd61d2d9979497386f
 
 % Code for NLP agent
 setup_nlp_agent :- 
@@ -86,7 +70,7 @@ parse_frase(Frase) :-
 		get_time(Time), 
 		stamp_date_time(Time,Date,10800),
 		format_time(atom(FormatedDate),'%Y%m%d%H%M%s',Date),
-		assertz(log_frase(Frase,FormatedDate	)) 
+		assertz(log_frase(Frase,FormatedDate)) 
 		;true),
 	snlp_parse(Frase),
 	:>writeln('Frase Parseada'),
