@@ -1,8 +1,5 @@
 package agilog.snlp;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -50,23 +47,27 @@ public class SNLPPrologAdapter {
 		return this.ners;
 	}
 	public SNLPPrologAdapter(String text) {
-		/*
+		
+		String textCap = text.substring(0, 1).toUpperCase() + text.substring(1);		
+		
+		
+		text.toUpperCase();
 		// this is your print stream, store the reference
-		PrintStream err = System.err;
+		//PrintStream err = System.err;
 
 		// now make all writes to the System.err stream silent 
-		System.setErr(new PrintStream(new OutputStream() {
+		//System.setErr(new PrintStream(new OutputStream() {
 			
-			@Override
-			public void write(int arg0) throws IOException {
+	//		@Override
+	//		public void write(int arg0) throws IOException {
 				// TODO Auto-generated method stub
 				
-			}
-		}));
+	//		}
+		//}));
 
-		*/
+		// YOUR CODE HERE
 
-		
+		// set everything bck to its original state afterwards
 		  
 		
 		// creates a StanfordCoreNLP object, with POS tagging, lemmatization, NER,
@@ -78,7 +79,7 @@ public class SNLPPrologAdapter {
 		
 
 		// create an empty Annotation just with the given text
-		Annotation document = new Annotation(text);
+		Annotation document = new Annotation(textCap);
 
 		// run all Annotators on this text
 		pipeline.annotate(document);
@@ -128,7 +129,7 @@ public class SNLPPrologAdapter {
 								+ ").";
 				grafoDependencias.add(arco.toLowerCase());
 			}
-			this.dependenceGraph = new String[0];
+			this.dependenceGraph = new String[1];
 			this.dependenceGraph = grafoDependencias.toArray(this.dependenceGraph);
 			
 			
@@ -141,10 +142,10 @@ public class SNLPPrologAdapter {
 								+ ").";
 				grafoDependenciasBasica.add(arco.toLowerCase());
 			}
-			this.dependenceGraph = new String[0];
+			this.dependenceGraph = new String[1];
 			this.dependenceGraph = grafoDependencias.toArray(this.dependenceGraph);
 			
-			this.basicDependenceGraph = new String[0];
+			this.basicDependenceGraph = new String[1];
 			this.basicDependenceGraph = grafoDependenciasBasica.toArray(this.basicDependenceGraph);
 
 		}
@@ -156,11 +157,16 @@ public class SNLPPrologAdapter {
 		// along with a method for getting the most representative mention
 		// Both sentence and token offsets start at 1!
 		//Map<Integer, CorefChain> graph = document.get(CorefChainAnnotation.class);
+		if(this.basicDependenceGraph.length>1)
 		limpaApostrofo();
 		//System.setErr(err);
 	}
 
 	private void limpaApostrofo() {
+
+		
+		
+		
 		for (int i = 0; i < this.basicDependenceGraph.length; i++) {
 			this.basicDependenceGraph[i] = this.basicDependenceGraph[i].replaceAll("'", "");
 		}
@@ -173,14 +179,15 @@ public class SNLPPrologAdapter {
 		for (int i = 0; i < this.ners.length; i++) {
 			this.ners[i] = this.ners[i].replaceAll("'", "");
 		}
+		
 		//this.parseTree.replaceAll("'", null);
 	}
 
 	public static void main(String[] args) {
-		SNLPPrologAdapter n = new SNLPPrologAdapter("Delete information about patient's middle in the name panel");
+		SNLPPrologAdapter n = new SNLPPrologAdapter("move postal code to the upper position");
 		String[] lista = n.getBasicDependenceGraph();
 		for (int i = 0; i < lista.length; i++) {
-			//System.out.println(lista[i]);
+			System.out.println(lista[i]);
 		}
 		
 		
