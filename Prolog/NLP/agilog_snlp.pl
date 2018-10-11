@@ -34,7 +34,7 @@ snlp_assert_pos_tag(N) :-
 	maplist(assertz,ListTerm).
 
 snlp_assert_ner_tag(N) :-
-	N::getNers([]) => Nes,
+	N::getNers([]) => Nes, 
 	array::Nes=>List,
 	maplist(term_string,ListTerm,List),
 	%writeln(ListTerm),
@@ -98,14 +98,10 @@ pronoun(X) :-
 whpronoun(X) :-
 	word(X,wdt,_). 
 
-numeral_identificado(Word,Numeral):-
-	ner(Word,Numeral,_),
-	Numeral \== 0.
-
-%write_on_file(Texto) :-
-%	open('teste.txt',append,Stream),
-%	write(Stream,Texto), nl,
-%	close(Stream).
+write_on_file(Texto) :-
+	open('teste.txt',append,Stream),
+	write(Stream,Texto), nl,
+	close(Stream).
 
 %Predicado para checar existencia do elemento na ONTOLOGIA e buscar o ID correspondente
 check_id_ontology(Name,Id) :-
@@ -130,21 +126,32 @@ limpa_base_crencas :-
 	retractall(hideVerb(_)),
 	retractall(moveVerb(_)).
 
-
 avaliar_transformacoes :-
-	limpa_base_crencas,
-	verb(Verb),
+	verb(Verb),	
+	%is_synonym('add',Verb),
 	\+is_synonym('hide',Verb),
+	%\+is_synonym('move',Verb),
+	limpa_base_crencas,
 	t1,
+	%%verifica se nao esta faltando where, se verdadeiro, entao prossegue na regra
 	resposta(R),
-	++resposta(R),
+	++resposta(R),	
+	where(_),
 	(where(Id) -> ++where(Id);true),
-	(what(What) -> ++what(What);true),
-	%write_on_file(R),
-	!.
+	(what(What) -> ++what(What);true),!.
+
 
 avaliar_transformacoes :-
-	limpa_base_crencas,
+	verb(Verb),
+	is_synonym('hide',Verb),
+	\+is_synonym('add',Verb),
+	\+is_synonym('move',Verb),	
+	retractall(transformation(_,_)),
+	retractall(resposta(_)),
+	retractall(where(_)),
+	retractall(where_name(_)),
+	retractall(what(_)),
+	retractall(what_id(_)),
 	t2,
 	resposta(R),
 	++resposta(R),
@@ -152,22 +159,103 @@ avaliar_transformacoes :-
 	(what(What) -> ++what(What);true),!.
 
 avaliar_transformacoes :-
-	limpa_base_crencas,
+	verb(Verb),	
+	is_synonym('move',Verb),
+	%\+is_synonym('add',Verb),
+	\+is_synonym('hide',Verb),	
+	retractall(transformation(_,_)),
+	retractall(resposta(_)),
+	retractall(where(_)),
+	retractall(where_name(_)),
+	retractall(what(_)),
+	retractall(what_id(_)),
 	t3,
 	resposta(R),
 	++resposta(R),
 	(position(Position) -> ++position(Position);true),
 	(what(What) -> ++what(What);true),!.
 
+%#################################################################
+
+
 avaliar_transformacoes :-
+	%retractall(transformation(_,_)),
+	retractall(resposta(_)),
+	what(_),
+	transformation(t1,_),
+	t1_reverse_miss_where,
+	resposta(R),
+	++resposta(R),
+	(where(Id) -> ++where(Id);true),
+	(what(What) -> ++what(What);true),
+	write_on_file(R),
+	:>writeln('ate aqui ja e'),!.
+
+avaliar_transformacoes :-
+	%retractall(transformation(_,_)),
+	retractall(resposta(_)),
+	where(_),
+	t1_reverse_miss_what,
+	resposta(R),
+	++resposta(R),
+	(where(Id) -> ++where(Id);true),
+	(what(What) -> ++what(What);true),
+	write_on_file(R),
+	:>writeln('ate aqui ja e1'),!.
+
+avaliar_transformacoes :-
+	%retractall(transformation(_,_)),
+	retractall(resposta(_)),
+	what(_),
+	t2_reverse_miss_where,
+	resposta(R),
+	++resposta(R),
+	(where(Id) -> ++where(Id);true),
+	(what(What) -> ++what(What);true),
+	write_on_file(R),
+	:>writeln('ate aqui ja e2'),!.
+
+avaliar_transformacoes :-
+	%retractall(transformation(_,_)),
+	retractall(resposta(_)),
+	where(_),
+	t2_reverse_miss_what,
+	resposta(R),
+	++resposta(R),
+	(where(Id) -> ++where(Id);true),
+	(what(What) -> ++what(What);true),
+	write_on_file(R),
+	:>writeln('ate aqui ja e3'),!.
+
+
+%%Preciso dessa regra para parar uma frase incompleta, pois frases incompletas vao ate a ultima regra avaliar_transformacoes e acaba
+%mentindo que nao foi encontrada
+avaliar_transformacoes :-
+	what(_),
+	\+where(_),!.
+
+%%Preciso dessa regra para parar uma frase incompleta, pois frases incompletas vao ate a ultima regra avaliar_transformacoes e acaba
+%mentindo que nao foi encontrada
+avaliar_transformacoes :-
+	where(_),
+	\+what(_),!.
+
+
+avaliar_transformacoes :-
+		
 	limpa_base_crencas,
 	help,
 	resposta(R),
 	++resposta(R),!.
-	
+
 
 avaliar_transformacoes :-
-	limpa_base_crencas,
+:>writeln('ate aqui nao'),
+	retractall(transformation(_)),
+	retractall(resposta(_)),
+	retractall(where(_)),
+	retractall(where_name(_)),
+	retractall(what(_)),
 	++resposta('Sorry, we could not identify a transformation matching your necessity. I can add fields to specific panels and move UI elements.'),!.
 
 make_response :- 
@@ -185,6 +273,7 @@ make_response :-
 	where_name(Where_Name),
 	check_panel_id_ontology(Where_Name,Id),
 	assertz(where(Id)),
+	
 	assert_response,!.
 
 make_response :- 
@@ -203,6 +292,7 @@ assert_response :-
 	what(What),
 	where(_),
 	where_name(Where),
+	assertz(miss_where('no')),
 	atomic_list_concat(['Transformation ',Transf, ' identified. New field: ',What,' is going to be created in the ',Where],Resposta),
 	assertz(resposta(Resposta)),!.
 
@@ -215,17 +305,6 @@ assert_response :-
 	where_name(Where),
 	atomic_list_concat(['Transformation ',Transf, ' identified. ',What, ' is going to removed from the ', Where],Resposta),
 	assertz(resposta(Resposta)),!.
-
-assert_response :-	
-	transformation(t2,Rule),
-	atom_concat('t2.',Rule,Transf),
-	what(What),
-	\+what_id(_),
-	where(_),
-	where_name(Where),
-	atomic_list_concat(['Transformation ',Transf, ' identified. But there is no ',What, ' field in the ', Where],Resposta),
-	assertz(resposta(Resposta)),!.
-
 assert_response :-	
 	transformation(t3,Rule),
 	atom_concat('t3.',Rule,Transf),
@@ -239,7 +318,7 @@ assert_response :-
 	transformation(t1,Rule),
 	atom_concat('t1.',Rule,Transf),
 	\+what(_),
-	check_panel_id_ontology(Where,_),
+	assertz(miss_what('yes')),
 	where_name(Where),	
 	atomic_list_concat(['Transformation ',Transf, ' indentified, please inform what field do you want to create in the ',Where],Resposta),
 	assertz(resposta(Resposta)),!.
@@ -250,7 +329,8 @@ assert_response :-
 	what(What),
 	\+ where(_),
 	\+ where_name(_),
-	atomic_list_concat(['Transformation ',Transf, ' indentified, please inform where the field ',What, ' should be created.'],Resposta),
+	assertz(miss_where('yes')),
+	atomic_list_concat(['Transformation ',Transf, ' indentified, please inform where the field ',What, ' should be created:'],Resposta),
 	assertz(resposta(Resposta)),!.
 
 assert_response :-
@@ -258,8 +338,9 @@ assert_response :-
 	atom_concat('t1.',Rule,Transf),
 	what(What),
 	\+ where(_),
+	assertz(miss_where('yes')),
 	where_name(Where_Name),
-	atomic_list_concat(['Transformation ',Transf, ' indentified, but the panel ',Where_Name ,' does not exists in the system. Please inform in what panel you want the field ',What, ' to be created.'],Resposta),
+	atomic_list_concat(['Transformation ',Transf, ' indentified, but the panel ',Where_Name ,' does not exists in the system. Please inform in what panel you want the field ',What, ' to be created:'],Resposta),
 	assertz(resposta(Resposta)),!.
 
 assert_response :-
@@ -274,20 +355,20 @@ assert_response :-
 	transformation(t2,Rule),
 	atom_concat('t2.',Rule,Transf),
 	what(What),
+	what_id(_),
 	\+ where(_),
 	\+ where_name(_),
-	\+what_id(_),
-	atomic_list_concat(['Transformation ',Transf, ' indentified, But there is no ',What, ' field. Please inform a valid field and its location panel.'],Resposta),
+	atomic_list_concat(['Transformation ',Transf, ' indentified, please inform where the field ',What, ' is located:'],Resposta),
 	assertz(resposta(Resposta)),!.
-
 
 assert_response :-
 	transformation(t2,Rule),
 	atom_concat('t2.',Rule,Transf),
 	what(What),
+	\+what_id(_),
 	\+ where(_),
 	\+ where_name(_),
-	atomic_list_concat(['Transformation ',Transf, ' indentified, please inform where the field ',What, ' is located.'],Resposta),
+	atomic_list_concat(['Transformation ',Transf, ' indentified, but there is no ',What, ' field in the system.'],Resposta),
 	assertz(resposta(Resposta)),!.
 
 assert_response :-
@@ -297,6 +378,16 @@ assert_response :-
 	\+ where(_),
 	where_name(Where_Name),
 	atomic_list_concat(['Transformation ',Transf, ' indentified, but the panel ',Where_Name ,' does not exists in the system. Please inform in what panel you want the field ',What, ' to be hidden.'],Resposta),
+	assertz(resposta(Resposta)),!.
+
+assert_response :-
+	transformation(t2,Rule),
+	atom_concat('t2.',Rule,Transf),
+	what(What),
+	\+what_id(_),
+	where(_),
+	where_name(Where_Name),
+	atomic_list_concat(['Transformation ',Transf, ' indentified, but the field ',What ,' does not exists in the system. Please inform what field do you want to hide from ',Where_Name],Resposta),
 	assertz(resposta(Resposta)),!.
 
 assert_response :-

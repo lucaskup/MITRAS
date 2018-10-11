@@ -7,6 +7,39 @@
 %% On the customer register, please remove Cell Phone field
 %% Cut out identity field from customer register (nao funciona)
 
+
+%%contempla nomes de campos com relacoes amod e panel no final
+t2 :-
+	verb(Verb),
+	is_synonym('hide',Verb),
+	edge_dependence_basic(Verb,What,dobj),
+	edge_dependence_basic(Verb,Where,nmod),
+	%%edge_dependence_basic(Where,Where_Complement,compound),
+	is_synonym('field',What),
+	is_synonym('panel',Where),
+
+	%%usa a proxima verificacao apenas para comprovar a existencia de um compound relacionado com um substantivo para validar a regra.	
+	edge_dependence_basic(What,_,compound),
+
+	edge_dependence_basic(What,What_Conc,amod),
+
+	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds	
+	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
+	atomic_list_concat(List_Compound_What, '_',Compound_What),
+
+	atom_concat(What_Conc,'_',U_What_Complement),
+	atom_concat(U_What_Complement,Compound_What,Complete_What),
+
+	findall(X,edge_dependence_basic(Where, X, compound),List_Compound_Where),
+	length(List_Compound_Where,CompoundQTD),
+	CompoundQTD > 1,
+	atomic_list_concat(List_Compound_Where, '_',Complete_Where),
+
+	assertz(transformation(t2,0.0)),
+	assertz(what(Complete_What)),
+	assertz(where_name(Complete_Where)),
+	make_response,!.
+
 %%Aqui tem adicao da palavra panel no final
 t2 :-
 	verb(Verb),
@@ -34,6 +67,36 @@ t2 :-
 	assertz(where_name(Complete_Where)),
 	make_response,!.
 
+%%contempla nomes de campos com relacoes amod
+t2 :-
+	verb(Verb),
+	is_synonym('hide',Verb),
+	edge_dependence_basic(Verb,What,dobj),
+	edge_dependence_basic(Verb,Where,nmod),
+	edge_dependence_basic(Where,Where_Complement,compound),
+	is_synonym('field',What),
+
+
+	%%usa a proxima verificacao apenas para comprovar a existencia de um compound relacionado com um substantivo para validar a regra.	
+	edge_dependence_basic(What,_,compound),
+
+	edge_dependence_basic(What,What_Conc,amod),
+
+	%%encontra todas as dependencias entre um substantivo ligado ao verbo principal e seus compounds	
+	findall(X,edge_dependence_basic(What, X, compound),List_Compound_What),
+	atomic_list_concat(List_Compound_What, '_',Compound_What),
+
+	atom_concat(What_Conc,'_',U_What_Complement),
+	atom_concat(U_What_Complement,Compound_What,Complete_What),
+
+	atom_concat(Where_Complement,'_',U_Where_Complement),
+	atom_concat(U_Where_Complement,Where,Complete_Where),
+
+	assertz(transformation(t2,1.1)),
+	assertz(what(Complete_What)),
+	assertz(where_name(Complete_Where)),
+	make_response,!.
+
 t2 :-
 	verb(Verb),
 	is_synonym('hide',Verb),
@@ -53,6 +116,31 @@ t2 :-
 	atom_concat(U_Where_Complement,Where,Complete_Where),
 
 	assertz(transformation(t2,1)),
+	assertz(what(Complete_What)),
+	assertz(where_name(Complete_Where)),
+	make_response,!.
+
+%%contempla nomes de campos com relacoes amod sem 'field' e panel no final
+t2 :-
+	verb(Verb),
+	is_synonym('hide',Verb),
+	edge_dependence_basic(Verb,What,dobj),
+	edge_dependence_basic(Verb,Where,nmod),
+	%%edge_dependence_basic(Where,Where_Complement,compound),
+
+	is_synonym('panel',Where),
+
+	edge_dependence_basic(What,What_Conc,amod),
+
+	atom_concat(What_Conc,'_',U_What_Complement),
+	atom_concat(U_What_Complement,What,Complete_What),
+
+	findall(X,edge_dependence_basic(Where, X, compound),List_Compound_Where),
+	length(List_Compound_Where,CompoundQTD),
+	CompoundQTD > 1,
+	atomic_list_concat(List_Compound_Where, '_',Complete_Where),
+
+	assertz(transformation(t2,2.0)),
 	assertz(what(Complete_What)),
 	assertz(where_name(Complete_Where)),
 	make_response,!.
@@ -86,6 +174,27 @@ t2 :-
 	atomic_list_concat(List_Compound_Where, '_',Complete_Where),
 
 	assertz(transformation(t2,2)),
+	assertz(what(Complete_What)),
+	assertz(where_name(Complete_Where)),
+	make_response,!.
+
+%%%%sem field e sem panel mas com relacao de um verbo e campo por amod
+t2 :-
+	verb(Verb),
+	is_synonym('hide',Verb),
+	edge_dependence_basic(Verb,What,dobj),
+	(edge_dependence_basic(Verb,Where,nmod);edge_dependence_basic(What,Where,nmod)),
+	edge_dependence_basic(Where,Where_Complement,compound),
+
+	edge_dependence_basic(What,What_Conc,amod),
+
+	atom_concat(What_Conc,'_',U_What_Complement),
+	atom_concat(U_What_Complement,What,Complete_What),	
+
+	atom_concat(Where_Complement,'_',U_Where_Complement),
+	atom_concat(U_Where_Complement,Where,Complete_Where),
+
+	assertz(transformation(t2,3.0)),
 	assertz(what(Complete_What)),
 	assertz(where_name(Complete_Where)),
 	make_response,!.
@@ -433,7 +542,7 @@ t2 :-
 	make_response,!.
 
 %%Frase exemplo: 
-%% Delete identity card field in the register/Remove cell phone number field
+%% Delete identity card field in the register/Remove cell phone number field/Hide status field
 
 t2 :-
 	verb(Verb),
@@ -561,5 +670,57 @@ t2 :-
 	%writeln('## Transformation 2 ##'),
 	%write('Field To Hide: '),writeln(Complete_What),
 	%write('Location Name: >> NOT INFORMED <<'),!.
+
+
+t2_reverse_miss_where :-
+	\+verb(_),	
+	noun(Panel),
+	is_synonym('panel',Panel),
+	findall(X,edge_dependence_basic(Panel, X, compound),List_Compound_Where),
+	atomic_list_concat(List_Compound_Where, '_',Complete_Where),
+	assertz(transformation(t2,1113333)),
+	%assertz(what(What)),
+	assertz(where_name(Complete_Where)),
+	make_response,!.
+
+t2_reverse_miss_where :-
+	\+verb(_),	
+	noun(Noun),
+	\+is_synonym('panel',Noun),
+	edge_dependence_basic(Noun,Where,compound),
+
+	atom_concat(Where,'_',U_What_Complement),
+	atom_concat(U_What_Complement,Noun,Complete_Where),
+	
+	assertz(transformation(t2,222)),
+	%assertz(what(What)),
+	assertz(where_name(Complete_Where)),
+	make_response,!.	
+
+t2_reverse_miss_what :-
+	\+verb(_),	
+	noun(Field),
+	is_synonym('field',Field),
+	findall(X,edge_dependence_basic(Field, X, compound),List_Compound_What),
+	atomic_list_concat(List_Compound_What, '_',Complete_What),
+	assertz(transformation(t2,333)),
+	%assertz(what(What)),
+	assertz(what(Complete_What)),
+	make_response,!.
+
+t2_reverse_miss_what :-
+	\+verb(_),	
+	noun(Noun),
+	\+is_synonym('field',Noun),
+	edge_dependence_basic(Noun,What,compound),
+
+	atom_concat(What,'_',U_What_Complement),
+	atom_concat(U_What_Complement,Noun,Complete_What),
+	
+	assertz(transformation(t2,444)),
+	%assertz(what(What)),
+	assertz(what(Complete_What)),
+	make_response,!.	
+	
 
 

@@ -258,9 +258,12 @@ t1 :-
 	make_response,!.
 
 %% Frase exemplo:
-%% I need a field for secret name in the patient form
+%% I need a field for secret name in the patient name panel
 t1 :- 
 	adjective(Adjective),
+	
+	verb(Verb),
+	\+is_synonym('move',Verb),
 	edge_dependence_basic(What,Adjective,amod),
 	edge_dependence_basic(What,Where,nmod),
 	is_synonym('panel',Where),
@@ -285,6 +288,9 @@ t1 :-
 t1 :- 
 
 	adjective(Adjective),
+	
+	verb(Verb),
+	\+is_synonym('move',Verb),
 	edge_dependence_basic(What,Adjective,amod),
 	edge_dependence_basic(What,Where,nmod),
 	edge_dependence_basic(Where,Where_Complement,compound),
@@ -389,7 +395,7 @@ t1 :-
 	make_response,!.
 
 %Frase exemplo:
-%Create a field called Phone Number on the customer register
+%Create a field called Phone Number on the customer register panel
 t1 :-
 	verb(Verb),
 	is_synonym('add',Verb),
@@ -644,6 +650,8 @@ t1 :-
 	is_synonym('add',Verb),
 	edge_dependence_basic(Verb,What,dobj),
 
+	\+is_synonym('field',What),
+
 	%%usa a proxima verificacao apenas para comprovar a existencia de um compound relacionado com um substantivo para validar a regra.	
 	edge_dependence_basic(What,_,compound),
 
@@ -736,3 +744,86 @@ t1 :-
 	assertz(what(What)),
 	make_response,!.
 
+%%Frase exemplo: 
+%%Please, add age field
+t1 :-
+	verb(Verb),
+	is_synonym('add',Verb),
+	edge_dependence_basic(Verb,What,dobj),
+
+	is_synonym('field',What),
+
+	%%usa a proxima verificacao apenas para comprovar a existencia de um compound relacionado com um substantivo para validar a regra.	
+	edge_dependence_basic(What,What_Complement,compound),
+
+	%writeln('16'),
+	%writeln('## Transformation 1 ##'),
+	%write('Field Name: '),writeln(Complete_What),
+
+	assertz(transformation(t1,27)),
+	assertz(what(What_Complement)),
+	make_response,!.
+
+t1_reverse_miss_where :-
+	\+verb(_),	
+	noun(Panel),
+	is_synonym('panel',Panel),
+	findall(X,edge_dependence_basic(Panel, X, compound),List_Compound_Where),
+	atomic_list_concat(List_Compound_Where, '_',Complete_Where),
+	assertz(transformation(t1,111)),
+	%assertz(what(What)),
+	assertz(where_name(Complete_Where)),
+	make_response,!.
+
+t1_reverse_miss_where :-
+	\+verb(_),	
+	noun(Noun),
+	\+is_synonym('panel',Noun),
+	edge_dependence_basic(Noun,Where,compound),
+
+	atom_concat(Where,'_',U_What_Complement),
+	atom_concat(U_What_Complement,Noun,Complete_Where),
+	
+	assertz(transformation(t1,222)),
+	%assertz(what(What)),
+	assertz(where_name(Complete_Where)),
+	make_response,!.	
+
+t1_reverse_miss_what :-
+	\+verb(_),	
+	noun(Field),
+	is_synonym('field',Field),
+	findall(X,edge_dependence_basic(Field, X, compound),List_Compound_What),
+	atomic_list_concat(List_Compound_What, '_',Complete_What),
+	assertz(transformation(t1,333)),
+	%assertz(what(What)),
+	assertz(what(Complete_What)),
+	make_response,!.
+
+t1_reverse_miss_what :-
+	\+verb(_),	
+	noun(Noun),
+	\+is_synonym('field',Noun),
+	edge_dependence_basic(Noun,What,compound),
+
+	atom_concat(What,'_',U_What_Complement),
+	atom_concat(U_What_Complement,Noun,Complete_What),
+	
+	assertz(transformation(t1,444)),
+	%assertz(what(What)),
+	assertz(what(Complete_What)),
+	make_response,!.	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+teste_unitario_t1(Frase, What, Where) :-
+	snlp_parse(Frase),
+		((t1,
+		what(What),
+		where_name(Where))-> true;
+								 throw(error(Frase,
+								 	context(t1/1,'Erro, frase não identificada')))).
+ teste_t1 :-
+	teste_unitario_t1('create name field in the name panel', name,name_panel),
+	teste_unitario_t1('create nickname in the identifier panel',nickname,identifier_panel).
